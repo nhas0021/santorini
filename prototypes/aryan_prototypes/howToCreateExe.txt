@@ -1,0 +1,10 @@
+Note: Make sure you have CD'd into the appropriate folder, in this case aryan_prototypes
+
+In order to create an exe file, make sure you run:
+pyinstaller --onefile --hidden-import=tkinter "filename"
+
+For example, in this prototype, run the following code:
+pyinstaller --onefile --hidden-import=tkinter tkinterTest.py
+
+Have to include --hidden-import otherwise it does not include
+tkinter and doesn't run.
