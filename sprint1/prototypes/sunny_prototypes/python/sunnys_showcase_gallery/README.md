@@ -9,5 +9,6 @@
 
 ## Build Steps
 1) `pip install pyinstaller` ([See More](https://pyinstaller.org/en/stable/index.html))
-2) `pyinstaller .\showcase_selector.py --onedir --name 'Sunny_Prototype' --contents-directory 'Assets' --hidden-import=tkinter --add-data ./art:art`
-3) (Optional) Run from cmd with error display `.\Sunny_Prototype.exe && pause`
+2)  Ensure current directory is `sunnys_showcase_gallery`
+3) `pyinstaller .\showcase_selector.py --onedir --name 'Sunny_Prototype' --contents-directory 'Assets' --hidden-import=tkinter --add-data ./art:art`
+4) (Optional) Run from cmd with error display `.\Sunny_Prototype.exe && pause`
