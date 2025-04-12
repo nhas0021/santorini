@@ -34,16 +34,6 @@ SceneManager.register_scene(SceneID.MAIN_MENU,  Scenes.MainMenu(
 
 # endregion
 
-# region Config Scene Transitions
-"""
-Ideas:
-- everything loads from file/json?
-- use a manager to change scene (done)
-    - load scene by name?
-
-"""
-
-# endregion
 # region Start Application
 SceneManager.change_scene(SceneID.TITLE)  # ! Make sure to show a screen on start
 ROOT.mainloop()  # ! Start
