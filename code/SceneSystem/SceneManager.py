@@ -1,14 +1,14 @@
-from typing import TypeVar, Generic, Dict, Optional
-from typing import Self
+from typing import Dict, Optional
 
-SceneIDType = TypeVar("SceneIDType")
+from SceneSystem.BaseSceneID import BaseSceneID
+from SceneSystem.Scene import Scene
 
 
-class SceneManager(Generic[SceneIDType]):
+class SceneManager:
     _instance: Optional["SceneManager"] = None
-    
-    current_scene: Optional["Scene"] = None
-    scenes: Dict[SceneIDType, "Scene"] = {} 
+
+    current_scene: Optional[Scene] = None
+    scenes: Dict[BaseSceneID, Scene] = {}
 
     def __init__(self):
         if SceneManager._instance:
@@ -17,11 +17,11 @@ class SceneManager(Generic[SceneIDType]):
         SceneManager._instance = self
 
     @staticmethod
-    def register_scene(scene_id: SceneIDType, scene: "Scene") -> None:
+    def register_scene(scene_id: BaseSceneID, scene: Scene) -> None:
         SceneManager.scenes[scene_id] = scene
 
     @staticmethod
-    def change_scene(scene_id: SceneIDType) -> None:
+    def change_scene(scene_id: BaseSceneID) -> None:
         if SceneManager.current_scene is None:
             print(
                 f"Changing scene from N/A to {SceneManager.scenes[scene_id]}. (This may be an error)")
