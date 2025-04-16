@@ -4,15 +4,6 @@ from SceneID import SceneID
 from SceneSystem.SceneManager import SceneManager
 import Scenes
 
-# region Consts
-
-
-def DEFAULT_CALLBACK():
-    print("OVERRIDE THIS")
-
-
-# endregion
-
 if __name__ == "__main__":
 
     # region Launch Args
@@ -36,6 +27,7 @@ if __name__ == "__main__":
     SceneManager.register_scene(SceneID.MAIN_MENU,  Scenes.MainMenu(
         ROOT))
 
+    SceneManager.register_scene(SceneID.PRE_GAME, Scenes.CharacterSelect(ROOT))
     # endregion
 
     # region Start Application

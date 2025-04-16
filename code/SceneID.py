@@ -5,4 +5,8 @@ from SceneSystem.BaseSceneID import BaseSceneID
 class SceneID(BaseSceneID, Enum):
     TITLE = 1
     MAIN_MENU = 2
-    GAME = 3
+    TUTORIAL = 3
+    RULEBOOK = 4
+    PRE_GAME = 5
+    GAME = 6
+    SETTINGS = 7

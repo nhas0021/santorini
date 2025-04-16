@@ -1,4 +1,6 @@
 import tkinter as tk
+from Game import MatchData
+from MathLib.Vector import Vector2I
 from SceneID import SceneID
 from Styles import *
 
@@ -22,3 +24,38 @@ class Title (Scene):
 class MainMenu(Scene):
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
+
+        # ! Change this later the placements/styles of these later
+        self.text_title = tk.Label(
+            self.frame, bg=BG_COLOUR, text="Santorini", fg=TEXT_COLOUR, justify="center")
+        self.text_title.place(anchor="center")
+
+        self.button_play = tk.Button(
+            self.frame, text="Play", bg=BG_SUB_COLOUR, borderwidth=0, command=lambda: SceneManager.change_scene(SceneID.PRE_GAME))
+        self.button_play.pack()
+
+        self.button_tutorial = tk.Button(
+            self.frame, text="Tutorial", bg=BG_SUB_COLOUR, borderwidth=0, command=lambda: SceneManager.change_scene(SceneID.TUTORIAL))
+        self.button_tutorial.pack()
+
+        self.button_rulebook = tk.Button(
+            self.frame, text="Rule Book", bg=BG_SUB_COLOUR, borderwidth=0, command=lambda: SceneManager.change_scene(SceneID.RULEBOOK))
+        self.button_rulebook.pack()
+
+        self.button_settings = tk.Button(
+            self.frame, text="Settings", bg=BG_SUB_COLOUR, borderwidth=0, command=lambda: SceneManager.change_scene(SceneID.SETTINGS))
+        self.button_settings.pack()
+
+        self.button_quit = tk.Button(
+            # ! replace with proper shutdown
+            self.frame, text="Quit", bg=BG_SUB_COLOUR, borderwidth=0, command=lambda: exit(0))
+        self.button_quit.pack()
+
+
+class CharacterSelect(Scene):
+    def __init__(self, root: tk.Tk) -> None:
+        super().__init__(root)
+
+        # TODO: Assign match data to a global state
+        # match = MatchData(2, Vector2I(5, 5))
+

@@ -17,3 +17,17 @@ class Scene:
 
     def enable_scene(self):
         self.frame.pack_configure(fill="both", expand=True)
+
+# ~ TEMPLATE SCENE
+"""
+import tkinter as tk
+from SceneID import SceneID
+from Styles import *
+
+from SceneSystem.Scene import Scene
+from SceneSystem.SceneManager import SceneManager
+
+class SceneName(Scene):
+    def __init__(self, root: tk.Tk) -> None:
+        super().__init__(root)
+"""
