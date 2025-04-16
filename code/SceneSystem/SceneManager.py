@@ -5,16 +5,8 @@ from SceneSystem.Scene import Scene
 
 
 class SceneManager:
-    _instance: Optional["SceneManager"] = None
-
     current_scene: Optional[Scene] = None
     scenes: Dict[BaseSceneID, Scene] = {}
-
-    def __init__(self):
-        if SceneManager._instance:
-            raise Exception(
-                "There must only be one instance of this singleton.")
-        SceneManager._instance = self
 
     @staticmethod
     def register_scene(scene_id: BaseSceneID, scene: Scene) -> None:
