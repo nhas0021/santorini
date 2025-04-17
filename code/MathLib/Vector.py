@@ -44,10 +44,13 @@ class Vector2:
 
     # ! v1 == v2
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, Vector2): # * We can eval if both are vectors
+        if isinstance(other, Vector2):  # * We can eval if both are vectors
             return (self.x == other.x) and (self.y == other.y)
-        return NotImplemented # * If another class is used maybe that has a "==" eval for this expression
+        # * If another class is used maybe that has a "==" eval for this expression
+        return NotImplemented
 
+    def __iter__(self):
+        return iter((self.x, self.y))
 
     def __str__(self) -> str:
         return f"({self.x}, {self.y})"
@@ -66,7 +69,10 @@ class Vector2I:
     def __sub__(self, other: "Vector2I") -> "Vector2I":
         return Vector2I(self.x - other.x, self.y - other.y)
 
-    #? Most likely won't need
+    # ? Most likely won't need
     # # ! v2 = v1 * f
     # def __mul__(self, scalar: int) -> "Vector2I":
     #     return Vector2I(self.x * scalar, self.y * scalar)
+
+    def __iter__(self):
+        return iter((self.x, self.y))
