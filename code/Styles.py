@@ -6,3 +6,6 @@ BG_COLOUR: str = "#22223B"
 BG_SUB_COLOUR: str = "#4A4E69"
 
 TEXT_COLOUR: str = "#F2E9E4"
+
+WHITE: str = "#FFFFFF"
+BLACK: str = "#000000"
