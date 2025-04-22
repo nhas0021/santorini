@@ -2,6 +2,7 @@ import tkinter as tk
 from MathLib.Vector import Vector2I
 from SceneID import SceneID
 from Styles import *
+from God import God
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
@@ -33,7 +34,7 @@ class MatchData:
 
 class Player:
     def __init__(self):
-        self.hero_id:int
+        self.god:God
 
 
 class Tile:
