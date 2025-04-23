@@ -1,4 +1,3 @@
-#Note: Match Data wil have implementation of assigning god card to player (Check how that will connect to UI)
 from abc import ABC, abstractmethod
 
 class God(ABC):

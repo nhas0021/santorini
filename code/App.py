@@ -26,8 +26,11 @@ if __name__ == "__main__":
         ROOT))
     SceneManager.register_scene(SceneID.MAIN_MENU,  Scenes.MainMenu(
         ROOT))
+    
+    SceneManager.register_scene(SceneID.PRE_GAME,  Scenes.PreGame(
+        ROOT))
 
-    SceneManager.register_scene(SceneID.PRE_GAME, Scenes.CharacterSelect(ROOT))
+    SceneManager.register_scene(SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
     # endregion
 
     # region Start Application

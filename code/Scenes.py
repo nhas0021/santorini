@@ -1,11 +1,12 @@
 import tkinter as tk
-from Game import MatchData
+from Game import Game
 from MathLib.Vector import Vector2I
 from SceneID import SceneID
 from Styles import *
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
+from GameManager import GameManager
 
 
 class Title (Scene):
@@ -116,10 +117,142 @@ class MainMenu(Scene):
         self.image_label.place(relx=0.7, rely=0.6, anchor="center")
 
 
-class CharacterSelect(Scene):
-    def __init__(self, root: tk.Tk) -> None:
+class PreGame(Scene):
+    def __init__(self, root: tk.Tk):
         super().__init__(root)
+        self.frame.config(background=WHITE)
 
-        # TODO: Assign match data to a global state
-        # match = MatchData(2, Vector2I(5, 5))
+        # Game setup values (fixed for now, give option to change later)
+        self.player_count = 2
+        self.grid_size = Vector2I(5, 5)
+
+        # Title
+        self.title_label = tk.Label(
+            self.frame,
+            text="Santorini - Game Setup",
+            font=("Georgia", 32, "bold"),
+            bg="#ffffff",
+            fg="#2E2E2E"
+        )
+        self.title_label.pack(pady=30)
+
+        # Info Display (not editable yet)
+        self.info_text = tk.Label(
+            self.frame,
+            text=f"Number of Players: {self.player_count}\nGrid Size: {self.grid_size.x} x {self.grid_size.y}",
+            font=("Helvetica", 16),
+            bg="#ffffff",
+            fg="#333333",
+            justify="center"
+        )
+        self.info_text.pack(pady=20)
+
+        # Instruction
+        self.instructions_label = tk.Label(
+            self.frame,
+            text="Click below to assign gods and start the game.",
+            font=("Helvetica", 14),
+            bg="#ffffff"
+        )
+        self.instructions_label.pack(pady=10)
+
+        # Start Game Button
+        self.start_button = tk.Button(
+            self.frame,
+            text="Attain God Powers",
+            font=("Helvetica", 16, "bold"),
+            bg="#4CAF50",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=self.start_god_assignment
+        )
+        self.start_button.pack(pady=30)
+
+    def start_god_assignment(self):
+
+        # Create and store game instance
+        GameManager.setup_game(self.player_count, self.grid_size)
+
+        # Go to the god assignment scene
+        SceneManager.change_scene(SceneID.GOD_ASSIGNMENT)
+
+class GodAssignment(Scene):
+    def __init__(self, root: tk.Tk):
+        super().__init__(root)
+        self.frame.config(background=WHITE)
+
+        self.title_label = tk.Label(
+            self.frame,
+            text="God Assignment",
+            font=("Georgia", 28, "bold"),
+            bg="#ffffff",
+            fg="#2E2E2E"
+        )
+        self.title_label.pack(pady=30)
+
+        self.info_label = tk.Label(
+            self.frame,
+            text="Gods are being assigned randomly to players...",
+            font=("Helvetica", 14),
+            bg="#ffffff"
+        )
+        self.info_label.pack(pady=10)
+
+        self.assign_button = tk.Button(
+            self.frame,
+            text="Assign Gods",
+            font=("Helvetica", 16, "bold"),
+            bg="#4CAF50",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=self.assign_gods
+        )
+        self.assign_button.pack(pady=30)
+
+        self.result_frame = tk.Frame(self.frame, bg="#ffffff")
+        self.result_frame.pack(pady=10)
+
+        self.start_game_button = tk.Button(
+            self.frame,
+            text="Start Game",
+            font=("Helvetica", 16, "bold"),
+            bg="#1E88E5",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=self.start_game
+        )
+        self.start_game_button.pack(pady=20)
+        self.start_game_button.config(state="disabled")  # Hide until gods are assigned
+
+    def assign_gods(self):
+        game = GameManager.get_game()
+        game.assign_god_to_players()
+
+        self.info_label.config(text="Gods assigned! See below:")
+
+        # Clear old results if assignment button is clicked again
+        for widget in self.result_frame.winfo_children():
+            widget.destroy()
+
+        for player in game.players:
+            player_label = tk.Label(
+                self.result_frame,
+                text=f"Player {player.id} ➝ {player.god.name}",
+                font=("Helvetica", 14),
+                bg="#ffffff",
+                fg="#333333"
+            )
+            player_label.pack(anchor="w", pady=5)
+
+        self.start_game_button.config(state="normal")
+
+    def start_game(self):
+        SceneManager.change_scene(SceneID.GAME) #not a registered secne yet so throws an error
+
+        
+
+
 
