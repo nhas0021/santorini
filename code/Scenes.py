@@ -100,7 +100,6 @@ class MainMenu(Scene):
         self.button_settings.place(relx=0.2, rely=0.7, anchor="w")
 
         self.button_quit = tk.Button(
-            # ! replace with proper shutdown
             self.frame, text="Quit", font=("Comic Sans MS", 20),
             bg="#FF7F7F",        # light green
             fg=BLACK,      # text color
@@ -108,7 +107,8 @@ class MainMenu(Scene):
             activeforeground="white",    # hover text color
             borderwidth= 4,
             relief="solid",       # makes the border visible
-            width= 10)
+            width= 10,
+            command=root.destroy)  # Properly shuts down the application
         self.button_quit.place(relx=0.2, rely=0.85, anchor="w")
 
         # image
@@ -169,6 +169,19 @@ class PreGame(Scene):
         )
         self.start_button.pack(pady=30)
 
+        # Back button
+        self.back_button = tk.Button(
+            self.frame,
+            text="Back to Main Menu",
+            font=("Helvetica", 16),
+            bg="#FF7F7F",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
+        )
+        self.back_button.pack(pady=20)
+
     def start_god_assignment(self):
 
         # Create and store game instance
@@ -226,6 +239,18 @@ class GodAssignment(Scene):
         )
         self.start_game_button.pack(pady=20)
         self.start_game_button.config(state="disabled")  # Hide until gods are assigned
+        # Back button
+        self.back_button = tk.Button(
+            self.frame,
+            text="Back to Pre-Game",
+            font=("Helvetica", 16),
+            bg="#FF7F7F",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=lambda: SceneManager.change_scene(SceneID.PRE_GAME)
+        )
+        self.back_button.pack(pady=20)
 
     def assign_gods(self):
         game = GameManager.get_game()
