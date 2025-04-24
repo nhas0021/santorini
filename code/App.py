@@ -31,6 +31,9 @@ if __name__ == "__main__":
         ROOT))
 
     SceneManager.register_scene(SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
+
+    SceneManager.register_scene(SceneID.RULEBOOK, Scenes.RuleBook(
+        ROOT))
     # endregion
 
     # region Start Application

@@ -252,7 +252,52 @@ class GodAssignment(Scene):
     def start_game(self):
         SceneManager.change_scene(SceneID.GAME) #not a registered secne yet so throws an error
 
-        
+class RuleBook(Scene):
+    def __init__(self, root: tk.Tk):
+        super().__init__(root)
+        self.frame.config(background=WHITE)
 
+        self.title_label = tk.Label(
+            self.frame,
+            text="Rule Book",
+            font=("Georgia", 28, "bold"),
+            bg="#ffffff",
+            fg="#2E2E2E"
+        )
+        self.title_label.pack(pady=30)
 
+        # Rule book content (placeholder text)
+        self.rules_text = tk.Text(
+            self.frame,
+            wrap="word",
+            font=("Helvetica", 14),
+            bg="#ffffff",
+            fg="#333333",
+            height=20,
+            width=80
+        )
+        self.rules_text.pack(pady=10)
 
+        # Sample rules (replace with actual rules)
+        sample_rules = (
+            "1. Each player takes turns placing a worker on the board.\n"
+            "2. Players can build on the board to create structures.\n"
+            "3. The goal is to reach the third level of a structure.\n"
+            "4. Players can use god powers to gain advantages.\n"
+        )
+
+        self.rules_text.insert(tk.END, sample_rules)
+        self.rules_text.config(state="disabled")  # Make it read-only
+
+        # Back button
+        self.back_button = tk.Button(
+            self.frame,
+            text="Back to Main Menu",
+            font=("Helvetica", 16),
+            bg="#FF7F7F",
+            fg="white",
+            padx=20,
+            pady=10,
+            command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
+        )
+        self.back_button.pack(pady=20)
