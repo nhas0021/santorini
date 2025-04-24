@@ -1,6 +1,8 @@
 import tkinter as tk
 
+import Game
 from SceneID import SceneID
+from SettingManager import SettingManager
 from SceneSystem.SceneManager import SceneManager
 import Scenes
 
@@ -18,6 +20,7 @@ if __name__ == "__main__":
     ROOT.title("DEMO")
     ROOT.geometry(f"{screen_width}x{screen_height}")
 
+    SettingManager()  # ! Start it
     SceneManager()  # ! Start it
     # endregion
 
@@ -28,6 +31,8 @@ if __name__ == "__main__":
         ROOT))
 
     SceneManager.register_scene(SceneID.PRE_GAME, Scenes.CharacterSelect(ROOT))
+    SceneManager.register_scene(SceneID.GAME, Game.GameScene(
+        ROOT, SettingManager.map_frame_size))
     # endregion
 
     # region Start Application

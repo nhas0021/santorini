@@ -5,6 +5,16 @@ from SceneSystem.Scene import Scene
 
 
 class SceneManager:
+    """
+    Motivation:
+    - Isolation of data:
+        - Allows for better encapusulation
+        - Hiding the various objects (scope-wise) within the scene (buttons and labels) from other scenes
+    - Standardised & Clean Transitions
+        - Allows for multiple people to work on different parts of the game without interference
+        - Clean way to cchange scenes
+
+    """
     current_scene: Optional[Scene] = None
     scenes: Dict[BaseSceneID, Scene] = {}
 
@@ -23,6 +33,8 @@ class SceneManager:
 
         print(
             f"Changing scene from {SceneManager.current_scene} to {SceneManager.scenes[scene_id]}.")
+        SceneManager.current_scene.on_exit_scene()
         SceneManager.current_scene.disable_scene()
         SceneManager.current_scene = SceneManager.scenes[scene_id]
+        SceneManager.current_scene.on_enter_scene()
         SceneManager.current_scene.enable_scene()

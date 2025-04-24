@@ -1,7 +1,7 @@
 import tkinter as tk
-from Game import MatchData
 from MathLib.Vector import Vector2I
 from SceneID import SceneID
+from SettingManager import SettingManager
 from Styles import *
 
 from SceneSystem.Scene import Scene
@@ -56,6 +56,14 @@ class CharacterSelect(Scene):
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
 
-        # TODO: Assign match data to a global state
-        # match = MatchData(2, Vector2I(5, 5))
+        # TODO: get this from user input
+        __map_size = Vector2I(5, 5)
+        __map_render_size = Vector2I(500, 500)
 
+        # ! Set with chosen data
+        SettingManager.grid_size = __map_size
+        SettingManager.map_frame_size = __map_render_size
+
+        self.button_play = tk.Button(
+            self.frame, text="WIP - PLAY WITH DEFAULTS", bg=BG_SUB_COLOUR, borderwidth=0, command=lambda: SceneManager.change_scene(SceneID.GAME))
+        self.button_play.pack()

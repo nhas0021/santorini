@@ -1,6 +1,8 @@
 # https://coolors.co/palette/22223b-4a4e69-9a8c98-c9ada7-f2e9e4
 # https://www.tcl-lang.org/man/tcl8.4/TkCmd/colors.htm
-ERR_COLOUR: str = "magenta"
+DEBUG_ERR_COLOUR: str = "magenta"
+DEBUG_SPRITE_OUTLINE_COLOUR: str = "red1"
+DEBUG_SPRITE_AREA_COLOUR: str = "green1"
 
 BG_COLOUR: str = "#22223B"
 BG_SUB_COLOUR: str = "#4A4E69"

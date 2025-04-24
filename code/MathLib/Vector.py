@@ -7,6 +7,9 @@ class Vector2:
     x: float
     y: float
 
+    def __str__(self) -> str:
+        return f"({self.x}, {self.y})"
+
     def magnitude(self) -> float:
         return sqrt(self.x**2 + self.y**2)
 
@@ -52,8 +55,13 @@ class Vector2:
     def __iter__(self):
         return iter((self.x, self.y))
 
-    def __str__(self) -> str:
-        return f"({self.x}, {self.y})"
+    def __getitem__(self, index: int):
+        if index == 0:
+            return self.x
+        elif index == 1:
+            return self.y
+        else:
+            raise IndexError
 
 
 @dataclass
@@ -61,13 +69,19 @@ class Vector2I:
     x: int
     y: int
 
+    def __str__(self) -> str:
+        return f"({self.x}, {self.y})"
     # ! v3 = v1 + v2
+
     def __add__(self, other: "Vector2I") -> "Vector2I":
-        return Vector2I(self.x + other.x, self.y + other.y)
+        return Vector2I(self.x + other[0], self.y + other[1])
 
     # ! v3 = v1 - v2
     def __sub__(self, other: "Vector2I") -> "Vector2I":
-        return Vector2I(self.x - other.x, self.y - other.y)
+        return Vector2I(self.x - other[0], self.y - other[1])
+
+    def to_tuple(self):
+        return (self.x, self.y)
 
     # ? Most likely won't need
     # # ! v2 = v1 * f
@@ -76,3 +90,11 @@ class Vector2I:
 
     def __iter__(self):
         return iter((self.x, self.y))
+
+    def __getitem__(self, index: int):
+        if index == 0:
+            return self.x
+        elif index == 1:
+            return self.y
+        else:
+            raise IndexError
