@@ -13,6 +13,30 @@ class GameScene(Scene):
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
 
+#doesnt allow player naming yet (to be implemented in pre game scene)
+class Player:
+    player_count = 0 #Keep count of number of players initialized (also their id)
+
+    def __init__(self):
+        Player.player_count += 1
+        self.god:God = None
+        self.id = Player.player_count
+        self.workers: list[Worker] = [Worker(self.id), Worker(self.id)]
+
+
+    def assign_god(self, god: God):
+        self.god = god
+
+class Worker:
+    def __init__(self, player_id: int):
+        self.position: Vector2I = None  # ? Might not need
+        self.player_id = player_id
+
+class Tile:
+    def __init__(self, position: Vector2I):
+        self.position: Vector2I = position  # ? Might not need
+        self.stack_height: int = 0
+        self.worker: Worker = None
 
 #changed MatchData to Game
 class Game:
@@ -52,21 +76,17 @@ class Game:
 
     def get_tile(self, position: Vector2I):
         return self._grid[position.x][position.y]
+    
+    def move_worker(self, worker: Worker, new_position: Vector2I):
+        old_tile = self.get_tile(worker.position) if worker.position else None
+        new_tile = self.get_tile(new_position)
 
-#doesnt allow player naming yet (to be implemented in pre game scene)
-class Player:
-    player_count = 0 #Keep count of number of players initialized (also their id)
+        if old_tile:
+            old_tile.worker = None
 
-    def __init__(self):
-        Player.player_count += 1
-        self.god:God = None
-        self.id = Player.player_count
+        new_tile.worker = worker
+        worker.position = new_position
 
-    def assign_god(self, god: God):
-        self.god = god
-
-
-class Tile:
-    def __init__(self, position: Vector2I):
-        self.position: Vector2I = position  # ? Might not need
-        self.stack_height: int = 0
+    def add_stack(self, position: Vector2I):
+        tile = self.get_tile(position)
+        tile.stack_height += 1
