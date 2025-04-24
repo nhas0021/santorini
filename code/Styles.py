@@ -13,7 +13,8 @@ TEXT_COLOUR: str = "#F2E9E4"
 # ~ Game Colors
 WATER_COLOUR: str = "#0b5394"
 SAND_COLOUR: str = "#ffe599"
+DIRT_COLOUR: str = "#e0b97b"
 GRASS_COLOUR: str = "#6aa84f"
-STACK_COLOUR: str = "#b87100"
-DOME_COLOUR: str = "#ffd966"
+STACK_COLOUR: str = "#fbfbfb"
+DOME_COLOUR: str = "#dadada"
 PLAYER_COLORS = ["#f44336", "#2986cc", "#f6b26b", "#c90076"] # red, blue, orange

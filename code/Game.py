@@ -37,7 +37,7 @@ class GameScene(Scene):
         # ! Note: Acess should be [x][y].
         self._grid: Optional[list[list[Tile]]] = None
         self.map_frame: Frame = Frame(
-            self.frame, width=map_render_size.x, height=map_render_size.y, bg=SAND_COLOUR)
+            self.frame, width=map_render_size.x, height=map_render_size.y, bg=DIRT_COLOUR, highlightthickness=15, highlightbackground=SAND_COLOUR)
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
 
     def on_enter_scene(self):
@@ -55,8 +55,8 @@ class GameScene(Scene):
             for x in range(self.size.x):
                 tile_size = Vector2I(100, 100)  # TODO TEMP MAYBE
                 canvas = Canvas(self.map_frame, width=tile_size.x,
-                                height=tile_size.y, bg=GRASS_COLOUR)
-                canvas.grid(row=y, column=x)
+                                height=tile_size.y, bg=GRASS_COLOUR, highlightthickness=0)
+                canvas.grid(row=y, column=x, padx=5, pady=5)
 
                 # region TEMP
                 # TODO - change to use image or a proper generator later
@@ -84,16 +84,13 @@ class GameScene(Scene):
                                       stack_height*4, start=0, extent=180, fill=DOME_COLOUR)
 
                 # * Worker (colour change for different players)
-                w = canvas.create_oval(stack_grow_from_centre + 10, tile_size.y - stack_grow_bottom_offset -
-                                       stack_height*3, stack_grow_from_centre - 10, tile_size.y - stack_grow_bottom_offset -
-                                       stack_height*3 - 40, fill=DEBUG_ERR_COLOUR)
+                w_y = tile_size.y - stack_grow_bottom_offset - stack_height*3  # change this for each stack
+                w = canvas.create_oval(stack_grow_from_centre + 10, w_y,
+                                       stack_grow_from_centre - 10, w_y - 40, fill=DEBUG_ERR_COLOUR)
 
                 def on_canvas_click(e) -> None:
                     print(e)
                 canvas.bind("<Button-1>", on_canvas_click)
-
-                # btn = Button(self.map_frame, text=f"{x}-{y}")
-                # btn.grid(column=x, row=y)
                 # endregion
 
         # a = [[Button(self.map_frame, text=f"{x}-{y}")
