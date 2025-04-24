@@ -28,27 +28,16 @@ class Player:
         self.hero_id: int
 
 
-# class MapRenderer:
-#     def __init__(self, match_data: MatchData, render_size: Vector2I):
-#         self.render_frame = Frame(
-#             None, width=render_size.x, height=render_size.y, background=DEBUG_ERR_COLOUR, border=1)
-
-#         # self._grid: list[list[Button]] = [
-#         #     [Button(self.render_frame, text=f"{x}-{y}") for x in range(match_data.size.y)] for y in range(match_data.size.x)]
-
-
-#     def get_tile(self, position: Vector2I):
-#         return self._grid[position.x][position.y]
-
 class GameScene(Scene):
     def __init__(self, root: Tk, map_render_size: Vector2I) -> None:
         super().__init__(root)
+        self.frame.config(background=WATER_COLOUR)
 
         self.size: Optional[Vector2I] = None
         # ! Note: Acess should be [x][y].
         self._grid: Optional[list[list[Tile]]] = None
         self.map_frame: Frame = Frame(
-            self.frame, width=map_render_size.x, height=map_render_size.y, )
+            self.frame, width=map_render_size.x, height=map_render_size.y, bg=SAND_COLOUR)
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
 
     def on_enter_scene(self):
@@ -65,9 +54,9 @@ class GameScene(Scene):
         for y in range(self.size.y):
             for x in range(self.size.x):
                 tile_size = Vector2I(100, 100)  # TODO TEMP MAYBE
-                canvas = Canvas(self.map_frame, width=tile_size.x, height=tile_size.y, bg=GRASS_COLOUR,
-                                highlightthickness=1, highlightbackground="black")
-                canvas.grid(row=y, column=x, padx=1, pady=1)
+                canvas = Canvas(self.map_frame, width=tile_size.x,
+                                height=tile_size.y, bg=GRASS_COLOUR)
+                canvas.grid(row=y, column=x)
 
                 # region TEMP
                 # TODO - change to use image or a proper generator later
