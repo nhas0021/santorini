@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from tkinter import Canvas, Tk, Button, Frame
-from typing import Callable, Optional
+from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame
+from typing import Callable, List, Optional, Tuple
 from MathLib.Vector import Vector2I
 from SceneID import SceneID
 from SettingManager import SettingManager
@@ -10,17 +10,91 @@ from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
 
 
-@dataclass
 class Tile:
     """
-    Defaults are what a tile is before anything happens on them. 
+    Defaults are what a tile is before anything happens on them.
+
+    This tile generates the shapes instead of compositing using images, this for sprint 2 (to be changed in sprint 3)
     """
-    # ! Gameplay Data
-    position: Vector2I
-    stack_height: int = 0
-    worker: int = 0
-    # ! Interaction Data
-    on_click_callback: Optional[Callable] = None
+
+    def __init__(self, parent_frame: Frame, position: Vector2I, on_click_callback: Callable[[Event], None]) -> None:
+        # ! Gameplay Data
+        self.position: Vector2I = position
+        self.stack_height: int = 15
+        self.worker: int = 0
+        # ! Sprite / Data
+        # ? Note: some of this might be better suited in styles
+        self.stack_sprites: List[int] = []
+        self.dome_sprite: int = None
+        # * Note: Change colours for different players rather than make a new one
+        self.worker_sprite: int = None
+
+        self.scaled_tile_size = TILE_SIZE  # TODO add scaling
+
+        self.canvas = Canvas(parent_frame, width=self.scaled_tile_size.x,
+                             height=self.scaled_tile_size.y, bg=GRASS_COLOUR, highlightthickness=0)
+
+        padding = 5
+        self.canvas.grid(row=position.y, column=position.x,
+                         padx=padding, pady=padding)
+
+        # region TEMP
+        # TODO - change to use image
+        self.stack_grow_bottom_offset = 10
+        stack_grow_from_y = self.scaled_tile_size.y - self.stack_grow_bottom_offset
+        canvas_centre = self.scaled_tile_size.x//2
+
+        # * Stacks
+        stack_widths = (40, 30, 20)
+        self.stack_sprites = [
+            self.canvas.create_rectangle(canvas_centre + stack_widths[0], stack_grow_from_y - self.stack_height*0,
+                                         canvas_centre -
+                                         stack_widths[0], stack_grow_from_y -
+                                         self.stack_height*1,
+                                         fill=STACK_COLOUR),
+            self.canvas.create_rectangle(canvas_centre + stack_widths[1], stack_grow_from_y - self.stack_height*1,
+                                         canvas_centre -
+                                         stack_widths[1], stack_grow_from_y -
+                                         self.stack_height*2,
+                                         fill=STACK_COLOUR),
+            self.canvas.create_rectangle(canvas_centre + stack_widths[2], stack_grow_from_y - self.stack_height*2,
+                                         canvas_centre -
+                                         stack_widths[2], stack_grow_from_y -
+                                         self.stack_height*3,
+                                         fill=STACK_COLOUR)
+        ]
+        for sprite in self.stack_sprites:
+            self.canvas.itemconfig(sprite, state=HIDDEN)
+
+        stack_counter_text = self.canvas.create_text(
+            canvas_centre, self.scaled_tile_size.y - self.stack_grow_bottom_offset, anchor="s", text="?", justify="center", fill=TEXT_COLOUR)
+        self.canvas.itemconfig(stack_counter_text, state=HIDDEN)
+
+        # * Dome
+        dome_width = 20
+        self.dome_sprite = self.canvas.create_arc(canvas_centre + dome_width,
+                                                  stack_grow_from_y - self.stack_height*2,
+                                                  canvas_centre - dome_width,
+                                                  stack_grow_from_y - self.stack_height*4,
+                                                  start=0, extent=180, fill=DOME_COLOUR)
+        self.canvas.itemconfig(self.dome_sprite, state=HIDDEN)
+
+        # * Worker (colour change for different players)
+        worker_pos_y = stack_grow_from_y - \
+            self.stack_height*3  # change this for each stack
+        worker_width = 10
+        worker_height = 40
+        self.worker_sprite = self.canvas.create_oval(canvas_centre + worker_width,
+                                                     worker_pos_y,
+                                                     canvas_centre - worker_width,
+                                                     worker_pos_y - worker_height,
+                                                     fill=DEBUG_ERR_COLOUR)
+        self.canvas.itemconfig(self.worker_sprite, state=HIDDEN)
+
+        self.canvas.bind(
+            # ! Ensure that only the current (as of binding) values are stored
+            "<Button-1>", on_click_callback)
+        # endregion
 
 
 class Player:
@@ -43,63 +117,43 @@ class GameScene(Scene):
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
 
+    # * Note that tkinter is not fully typed
+    def __on_clicked_tile(self, position: Vector2I, e: Event) -> None:
+        # TODO replace with game logic
+        print(f"{position.x}-{position.y} | {e}")
+
+    def get_tile(self, position: Vector2I) -> Tile:
+        assert self._grid
+        return self._grid[position.x][position.y]
+
+    def change_stack_visuals(self, tile_position: Vector2I, stack_count: int):
+        assert stack_count <= SettingManager.stacks_before_dome+1
+        tile = self.get_tile(tile_position)
+
+        for i in range(SettingManager.stacks_before_dome):
+            if i <= stack_count-1:  # ? Active stacks
+                tile.canvas.itemconfigure(
+                    tile.stack_sprites[i], state=NORMAL)  # * show
+            else:
+                tile.canvas.itemconfigure(
+                    tile.stack_sprites[i], state=HIDDEN)  # * hide
+
+        # *Adjust worker pos (don't change visible state)
+        tile.canvas.coords(
+            tile.worker_sprite,
+            tile.scaled_tile_size.x//2,
+            tile.scaled_tile_size.y - tile.stack_grow_bottom_offset - tile.stack_height*stack_count)
+
     def start_game(self, grid_size: Vector2I):
         assert grid_size.x > 0
         assert grid_size.y > 0
         self.size = grid_size
         self._grid = [
             # * Generate tiles and give position data
-            [Tile(Vector2I(x, y)) for x in range(self.size.y)] for y in range(self.size.x)]
-
-        for y in range(self.size.y):
-            for x in range(self.size.x):
-                tile_size = Vector2I(100, 100)  # TODO TEMP MAYBE
-                canvas = Canvas(self.map_frame, width=tile_size.x,
-                                height=tile_size.y, bg=GRASS_COLOUR, highlightthickness=0)
-                canvas.grid(row=y, column=x, padx=5, pady=5)
-
-                # region TEMP
-                # TODO - change to use image or a proper generator later
-                stack_grow_bottom_offset = 10
-                stack_grow_from_centre = tile_size.x//2
-                stack_height = 15
-
-                # * Stacks
-                s1 = canvas.create_rectangle(stack_grow_from_centre + 40, tile_size.y - stack_grow_bottom_offset -
-                                             stack_height*0, stack_grow_from_centre-40, tile_size.y - stack_grow_bottom_offset -
-                                             stack_height*1, fill=STACK_COLOUR)
-                s2 = canvas.create_rectangle(stack_grow_from_centre + 30, tile_size.y - stack_grow_bottom_offset -
-                                             stack_height*1, stack_grow_from_centre-30, tile_size.y - stack_grow_bottom_offset -
-                                             stack_height*2, fill=STACK_COLOUR)
-                s3 = canvas.create_rectangle(stack_grow_from_centre + 20, tile_size.y - stack_grow_bottom_offset -
-                                             stack_height*2, stack_grow_from_centre-20, tile_size.y - stack_grow_bottom_offset -
-                                             stack_height*3, fill=STACK_COLOUR)
-
-                t = canvas.create_text(
-                    stack_grow_from_centre, tile_size.y - stack_grow_bottom_offset, anchor="s", text="?", justify="center", fill=TEXT_COLOUR)
-
-                # * Dome
-                d = canvas.create_arc(stack_grow_from_centre + 20, tile_size.y - stack_grow_bottom_offset -
-                                      stack_height*2, stack_grow_from_centre-20, tile_size.y - stack_grow_bottom_offset -
-                                      stack_height*4, start=0, extent=180, fill=DOME_COLOUR)
-
-                # * Worker (colour change for different players)
-                w_y = tile_size.y - stack_grow_bottom_offset - stack_height*3  # change this for each stack
-                w = canvas.create_oval(stack_grow_from_centre + 10, w_y,
-                                       stack_grow_from_centre - 10, w_y - 40, fill=DEBUG_ERR_COLOUR)
-
-                def on_canvas_click(e) -> None:
-                    print(e)
-                canvas.bind("<Button-1>", on_canvas_click)
-                # endregion
-
-        # a = [[Button(self.map_frame, text=f"{x}-{y}")
-        #       for x in range(self.size.y)] for y in range(self.size.x)]
+            [Tile(self.map_frame,  Vector2I(x, y), lambda e, pos=Vector2I(x, y): self.__on_clicked_tile(pos, e)) for x in range(self.size.y)] for y in range(self.size.x)]
 
     def cleanup(self):
+        # TODO reset everything
+        # TODO reset UI
         self.size = None
         self._grid = None
-
-    def get_tile(self, position: Vector2I) -> Tile:
-        assert self._grid
-        return self._grid[position.x][position.y]

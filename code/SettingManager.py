@@ -8,6 +8,7 @@ class SettingManager:
     player_count: int
     grid_size: Vector2I
     map_frame_size: Vector2I
+    stacks_before_dome: int
 
     @staticmethod
     def load_defaults() -> None:
