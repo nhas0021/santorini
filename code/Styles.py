@@ -8,3 +8,10 @@ BG_COLOUR: str = "#22223B"
 BG_SUB_COLOUR: str = "#4A4E69"
 
 TEXT_COLOUR: str = "#F2E9E4"
+
+
+# ~ Game Colors
+GRASS_COLOUR: str = "#6aa84f"
+STACK_COLOUR: str = "#ce7e00"
+DOME_COLOUR: str = "#ffd966"
+PLAYER_COLORS = ["#f44336", "#2986cc", "#6a329f", "#c90076"] # red, blue, purple, pink (maybe change last 2)

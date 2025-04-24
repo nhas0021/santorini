@@ -9,18 +9,17 @@ import Scenes
 if __name__ == "__main__":
 
     # region Launch Args
-    # sys.argv
-
-    screen_width: int = 1280
-    screen_height: int = 720
+    SettingManager()
+    SettingManager.load_defaults()
+    # ! load sys.argv
     # endregion
 
     # region Generate Window
     ROOT = tk.Tk()
     ROOT.title("DEMO")
-    ROOT.geometry(f"{screen_width}x{screen_height}")
+    ROOT.geometry(
+        f"{SettingManager.screen_size.x}x{SettingManager.screen_size.y}")
 
-    SettingManager()  # ! Start it
     SceneManager()  # ! Start it
     # endregion
 

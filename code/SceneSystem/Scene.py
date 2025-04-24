@@ -18,10 +18,8 @@ class Scene:
     def enable_scene(self):
         self.frame.pack_configure(fill="both", expand=True)
 
-    def on_enter_scene(self): return self._on_enter_scene
-    def _on_enter_scene(self): """Override this."""
-    def on_exit_scene(self): return self.__on_exit_scene
-    def __on_exit_scene(self): """Override this."""
+    def on_enter_scene(self): """Override this."""
+    def on_exit_scene(self): """Override this."""
 
 
 # ~ TEMPLATE SCENE
