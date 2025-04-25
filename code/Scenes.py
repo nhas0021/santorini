@@ -9,6 +9,7 @@ from Styles import *
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
+from GameManager import GameManager
 
 
 class Title (Scene):
@@ -127,16 +128,6 @@ class PreGame(Scene):
         self.frame.config(background=WHITE)
 
         # Game setup values (fixed for now, give option to change later)
-        self.player_count = 2
-        self.grid_size = Vector2I(5, 5)
-
-        # TODO: get this from user / styles
-        __map_render_size = Vector2I(500, 500)
-
-        # ! Set with chosen data
-        SettingManager.grid_size = self.grid_size
-        SettingManager.map_frame_size = __map_render_size
-
         # Title
         self.title_label = tk.Label(
             self.frame,
@@ -150,7 +141,7 @@ class PreGame(Scene):
         # Info Display (not editable yet)
         self.info_text = tk.Label(
             self.frame,
-            text=f"Number of Players: {self.player_count}\nGrid Size: {self.grid_size.x} x {self.grid_size.y}",
+            text=f"Number of Players: {SettingManager.player_count}\nGrid Size: {SettingManager.grid_size.x} x {SettingManager.grid_size.y}",
             font=("Helvetica", 16),
             bg="#ffffff",
             fg="#333333",
@@ -194,9 +185,7 @@ class PreGame(Scene):
         self.back_button.pack(pady=20)
 
     def start_god_assignment(self):
-        SettingManager.initialize_players(2)
-        # Create and store game instance
-        # GameManager.setup_game(self.player_count, self.grid_size)
+        GameManager.setup_game()
 
         # Go to the god assignment scene
         SceneManager.change_scene(SceneID.GOD_ASSIGNMENT)
@@ -266,8 +255,7 @@ class GodAssignment(Scene):
         self.back_button.pack(pady=20)
 
     def assign_gods(self):
-        SettingManager.assign_gods_random_from_list(
-            SettingManager.selectable_gods)
+        GameManager.get_game().assign_gods_random_from_list()
 
         self.info_label.config(text="Gods assigned! See below:")
 
@@ -275,7 +263,7 @@ class GodAssignment(Scene):
         for widget in self.result_frame.winfo_children():
             widget.destroy()
 
-        for player in SettingManager.players:
+        for player in GameManager.get_game().players:
             player_label = tk.Label(
                 self.result_frame,
                 text=f"Player {player.id} ➝ {player.god.name}",

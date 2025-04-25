@@ -30,8 +30,7 @@ if __name__ == "__main__":
     SceneManager.register_scene(SceneID.PRE_GAME,  Scenes.PreGame(ROOT))
 
     SceneManager.register_scene(SceneID.PRE_GAME, Scenes.PreGame(ROOT))
-    SceneManager.register_scene(SceneID.GAME, Game.GameScene(
-        ROOT, SettingManager.map_frame_size))
+    SceneManager.register_scene(SceneID.GAME, Game.GameScene(ROOT))
     SceneManager.register_scene(
         SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
 
