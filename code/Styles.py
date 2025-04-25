@@ -12,6 +12,9 @@ BG_SUB_COLOUR: str = "#4A4E69"
 
 TEXT_COLOUR: str = "#F2E9E4"
 
+WHITE: str = "#FFFFFF"
+BLACK: str = "#000000"
+
 
 # ~ Game Colors
 WATER_COLOUR: str = "#0b5394"

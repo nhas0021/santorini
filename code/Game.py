@@ -1,14 +1,14 @@
-from dataclasses import dataclass
 from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame
 from typing import Callable, List, Optional, Tuple
 from MathLib.Vector import Vector2I
 from SceneID import SceneID
 from SettingManager import SettingManager
 from Styles import *
+from God import God
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
-
+from Worker import Worker
 
 class Tile:
     """
@@ -21,7 +21,7 @@ class Tile:
         # ! Gameplay Data
         self.position: Vector2I = position
         self.stack_height: int = 15
-        self.worker: int = 0
+        self.worker: Worker = None
         # ! Sprite / Data
         # ? Note: some of this might be better suited in styles
         self.stack_sprites: List[int] = []
@@ -97,11 +97,6 @@ class Tile:
         # endregion
 
 
-class Player:
-    def __init__(self):
-        self.hero_id: int
-
-
 class GameScene(Scene):
     def __init__(self, root: Tk, map_render_size: Vector2I) -> None:
         super().__init__(root)
@@ -116,6 +111,9 @@ class GameScene(Scene):
 
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
+
+    def on_exit_scene(self):
+        self.cleanup()
 
     # * Note that tkinter is not fully typed
     def __on_clicked_tile(self, position: Vector2I, e: Event) -> None:
@@ -157,3 +155,17 @@ class GameScene(Scene):
         # TODO reset UI
         self.size = None
         self._grid = None
+
+    def move_worker(self, worker: Worker, new_position: Vector2I):
+        old_tile = self.get_tile(worker.position) if worker.position else None
+        new_tile = self.get_tile(new_position)
+
+        if old_tile:
+            old_tile.worker = None
+
+        new_tile.worker = worker
+        worker.position = new_position
+
+    def add_stack(self, position: Vector2I):
+        tile = self.get_tile(position)
+        tile.stack_height += 1
