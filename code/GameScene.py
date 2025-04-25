@@ -14,7 +14,8 @@ from SceneSystem.SceneManager import SceneManager
 from GameManager import GameManager
 from Worker import Worker
 
-
+#TODO: make the Game class hold the grid and not GameScene. use the GameManager to access the grid from the Game here in order to draw it out (this class should only handle UI)
+#TODO: Remove any game logic
 class GameScene(Scene):
     def __init__(self, root: Tk) -> None:
         super().__init__(root)
