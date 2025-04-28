@@ -24,3 +24,4 @@ class SettingManager:
 
         SettingManager.selectable_gods = [Artemis(), Demeter()]
         SettingManager.player_count = 2
+        SettingManager.stacks_before_dome = 3
