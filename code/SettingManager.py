@@ -11,7 +11,7 @@ class SettingManager:
     #players: list[Player] = []
     grid_size: Vector2I
     map_frame_size: Vector2I
-    stacks_before_dome: int
+    max_stacks_before_dome: int
     selectable_gods: List[God] = []
     player_count: int
 
@@ -24,4 +24,4 @@ class SettingManager:
 
         SettingManager.selectable_gods = [Artemis(), Demeter()]
         SettingManager.player_count = 2
-        SettingManager.stacks_before_dome = 3
+        SettingManager.max_stacks_before_dome = 3

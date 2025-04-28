@@ -56,6 +56,8 @@ class GameScene(Scene):
             f"[DEBUG] Clicked on tile at {position.x}-{position.y}, Phase: {self.current_phase}")
 
         assert GameManager.current_game
+
+        # region Action
         logic_tile = GameManager.current_game.get_tile(position)
 
         match self.current_phase:
@@ -84,6 +86,11 @@ class GameScene(Scene):
                             self.selected_worker, old_position, position)
                         self.current_phase = Phase.BUILD_STACK
 
+                # ! Note: "You win immediately if one of your workers moves from a lover level up to a level 3 tower"
+                if GameManager.current_game.check_if_winning_tile(position):
+                    print("GAME WON")  # TODO what happens after win
+                    raise NotImplementedError
+
             case Phase.BUILD_STACK:
                 print(f"[DEBUG] Building on tile at {position.x}-{position.y}")
 
@@ -101,23 +108,24 @@ class GameScene(Scene):
 
             case _:
                 raise Exception("Invalid game phase.")
+        # endregion
 
     def get_tile(self, position: Vector2I) -> Tile:
         assert self._grid
         return self._grid[position.x][position.y]
 
     def change_stack_visuals(self, tile_position: Vector2I, stack_count: int):
-        assert stack_count <= SettingManager.stacks_before_dome+1
+        assert stack_count <= SettingManager.max_stacks_before_dome+1
         tile = self.get_tile(tile_position)
 
-        for i in range(SettingManager.stacks_before_dome):
+        for i in range(SettingManager.max_stacks_before_dome):
             if i <= stack_count-1:
                 tile.canvas.itemconfigure(tile.stack_sprites[i], state=NORMAL)
             else:
                 tile.canvas.itemconfigure(tile.stack_sprites[i], state=HIDDEN)
 
         tile.canvas.itemconfigure(tile.dome_sprite, state=(
-            NORMAL if stack_count == SettingManager.stacks_before_dome + 1 else HIDDEN))
+            NORMAL if stack_count == SettingManager.max_stacks_before_dome + 1 else HIDDEN))
 
         # ! Note: this will still place a worker above a dome even if that is not allowed (this should not need to check)
         worker_centre_x = tile.scaled_tile_size.x // 2

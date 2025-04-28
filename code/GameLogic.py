@@ -1,4 +1,5 @@
 from random import sample
+from typing import Literal, Optional
 from MathLib.Vector import Vector2I
 from SettingManager import SettingManager
 from Player import Player
@@ -43,7 +44,7 @@ class Game:
         """
         From rulesheet: Unoccupied Space: A space not containing a worker or dome.
         """
-        if self.get_tile(position).stack_height >= SettingManager.stacks_before_dome+1:
+        if self.get_tile(position).stack_height >= SettingManager.max_stacks_before_dome+1:
             return False  # * dome check
 
         if self.get_tile(position).worker:
@@ -81,6 +82,11 @@ class Game:
             return False  # * cannot build onto occupied space
 
         return True
+
+    def check_if_winning_tile(self, position: Vector2I) -> Optional[Worker]:
+        if (winning_worker := self.get_tile(position).worker) and (self.get_tile(position).stack_height == SettingManager.max_stacks_before_dome):
+            return winning_worker
+        return None
 
     def move_worker(self, worker: Worker, new_position: Vector2I):
         old_tile = self.get_tile(worker.position) if worker.position else None
