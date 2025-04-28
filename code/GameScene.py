@@ -72,18 +72,4 @@ class GameScene(Scene):
         self.size = None
         self._grid = None
 
-    def move_worker(self, worker: Worker, new_position: Vector2I):
-        old_tile = self.get_tile(worker.position) if worker.position else None
-        new_tile = self.get_tile(new_position)
-
-        if old_tile:
-            old_tile.worker = None
-
-        new_tile.worker = worker
-        worker.position = new_position
-
-    def add_stack(self, position: Vector2I):
-        tile = self.get_tile(position)
-        tile.stack_height += 1
-
 
