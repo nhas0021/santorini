@@ -15,7 +15,6 @@ class Tile:
         # ! Gameplay Data
         self.position: Vector2I = position
         self.stack_height: int = 15
-        self.worker: Worker = None
         # ! Sprite / Data
         # ? Note: some of this might be better suited in styles
         self.stack_sprites: List[int] = []
