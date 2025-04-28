@@ -2,23 +2,26 @@ import random
 from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame
 from typing import Callable, List, Optional, Tuple
 from MathLib.Vector import Vector2I
-from SceneID import SceneID
 from SettingManager import SettingManager
 from Styles import *
 from God import God
-from Player import Player
 from Tile import Tile
-from LogicTile import LogicTile
+from enum import Enum, auto
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
 from GameManager import GameManager
 from Worker import Worker
 
+
+class Phase(Enum):
+    SELECT_WORKER = auto()
+    MOVE_WORKER = auto()
+    BUILD_STACK = auto()
+
+
 # TODO: make the Game class hold the grid and not GameScene. use the GameManager to access the grid from the Game here in order to draw it out (this class should only handle UI)
 # TODO: Remove any game logic
-
-
 class GameScene(Scene):
     def __init__(self, root: Tk) -> None:
         super().__init__(root)
@@ -39,7 +42,7 @@ class GameScene(Scene):
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
 
         # can be select_worker, move_worker, build_stack
-        self.current_phase = "select_worker"
+        self.current_phase: Phase = Phase.SELECT_WORKER
 
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
@@ -54,41 +57,59 @@ class GameScene(Scene):
 
         logic_tile = GameManager.current_game.get_tile(position)
 
-        if self.current_phase == "select_worker":
+        if self.current_phase == Phase.SELECT_WORKER:
             if logic_tile.worker:
                 print(
                     f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
                 self.selected_worker = logic_tile.worker
-                self.current_phase = "move_worker"
+                self.current_phase = Phase.MOVE_WORKER
             else:
                 print(
                     f"[DEBUG] No worker found on tile {position.x}-{position.y}.")
 
-        elif self.current_phase == "move_worker":
+        elif self.current_phase == Phase.MOVE_WORKER:
             if self.selected_worker:
-                print(
-                    f"[DEBUG] Moving worker {self.selected_worker.player_id} to {position.x}-{position.y}")
                 old_position = self.selected_worker.position
 
-                GameManager.current_game.move_worker(
-                    self.selected_worker, position)
-                self.move_worker_visual(
-                    self.selected_worker, old_position, position)
+                logic_tile = GameManager.current_game.get_tile(position)
+                
+                # Check if the tile selected to move to is adjacent to the worker
+                if self.is_adjacent(old_position, position):
+                    old_tile = GameManager.current_game.get_tile(old_position)
 
-                self.current_phase = "build_stack"
+                    # Check if the tile has a dome
+                    if logic_tile.stack_height <= SettingManager.stacks_before_dome:
+                        # Check height difference (must be at most 1)
+                        if logic_tile.stack_height - old_tile.stack_height <= 1:
+                            print(f"[DEBUG] Moving worker to {position.x}-{position.y}")
+                            GameManager.current_game.move_worker(self.selected_worker, position)
+                            self.move_worker_visual(self.selected_worker, old_position, position)
+                            self.current_phase = Phase.BUILD_STACK
+                        else:
+                            print(f"[DEBUG] Invalid move: height difference too large between {old_position.x}-{old_position.y} and {position.x}-{position.y}")
+                    else:
+                        print(f"[DEBUG] Invalid move: tile has a dome at {position.x}-{position.y}")
+                else:
+                    print(f"[DEBUG] Invalid move: {position.x}-{position.y} is too far!")
 
-        elif self.current_phase == "build_stack":
+        elif self.current_phase == Phase.BUILD_STACK:
             print(f"[DEBUG] Building on tile at {position.x}-{position.y}")
 
-            GameManager.current_game.add_stack(position)  # Update logic first
+            if self.selected_worker:
+                worker_position = self.selected_worker.position
 
-            logic_tile = GameManager.current_game.get_tile(
-                position)  # Get logic tile
-            # Use real level to update visuals
-            self.change_stack_visuals(position, logic_tile.stack_height)
+                # Check if the tile selected to build on is adjacent to the worker
+                if self.is_adjacent(worker_position, position):
+                    GameManager.current_game.add_stack(position)  # Update logic
+                    logic_tile = GameManager.current_game.get_tile(position)
+                    self.change_stack_visuals(position, logic_tile.stack_height)  # Update visuals
 
-            self.current_phase = "select_worker"
-            self.selected_worker = None
+                    self.current_phase = Phase.SELECT_WORKER
+                    self.selected_worker = None
+                else:
+                    print(f"[DEBUG] Invalid build: tile {position.x}-{position.y} is not adjacent to worker at {worker_position.x}-{worker_position.y}")
+            else:
+                print(f"[DEBUG] No worker selected for building.")
 
     def get_tile(self, position: Vector2I) -> Tile:
         assert self._grid
@@ -163,6 +184,11 @@ class GameScene(Scene):
             new_tile.canvas.itemconfig(new_tile.worker_sprite, state=NORMAL)
         else:
             new_tile.canvas.itemconfig(new_tile.worker_sprite, state=HIDDEN)
+
+    def is_adjacent(self, pos1: Vector2I, pos2: Vector2I) -> bool:
+        dx = abs(pos1.x - pos2.x)
+        dy = abs(pos1.y - pos2.y)
+        return max(dx, dy) == 1
 
     def cleanup(self):
         # TODO reset everything
