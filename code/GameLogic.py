@@ -1,15 +1,18 @@
 from random import sample
-from Tile import Tile
 from MathLib.Vector import Vector2I
 from SettingManager import SettingManager
 from Player import Player
 from Worker import Worker
-from Board import Board
+from LogicTile import LogicTile
 
 class Game:
     #ensure number of players = number of gods
     def __init__(self, player_count: int, size: Vector2I):
-        self.board = Board(size) 
+        self.size = size
+        self._grid: list[list[LogicTile]] = [
+            [LogicTile(Vector2I(x, y)) for y in range(size.y)]
+            for x in range(size.x)
+        ]
         self.players: list[Player] = []
         self.initialize_players(player_count)
 
@@ -33,11 +36,18 @@ class Game:
             p.assign_god(g)
 
     def get_tile(self, position: Vector2I):
-        return self.board.get_tile(position)
-    
+        return self._grid[position.x][position.y]
+
     def move_worker(self, worker: Worker, new_position: Vector2I):
-        self.board.move_worker(worker, new_position)
+        old_tile = self.get_tile(worker.position) if worker.position else None
+        new_tile = self.get_tile(new_position)
+
+        if old_tile:
+            old_tile.worker = None
+        new_tile.worker = worker
+        worker.position = new_position
 
     def add_stack(self, position: Vector2I):
-        self.board.add_stack(position)
+        tile = self.get_tile(position)
+        tile.stack_height += 1
     
