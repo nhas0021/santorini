@@ -39,7 +39,7 @@ class Game:
     def get_tile(self, position: Vector2I):
         return self._grid[position.x][position.y]
 
-    def validate_unoccupied_space(self, position: Vector2I):
+    def check_unoccupied_space(self, position: Vector2I):
         """
         From rulesheet: Unoccupied Space: A space not containing a worker or dome.
         """
@@ -51,22 +51,20 @@ class Game:
 
         return True
 
-    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: int = -1):
+    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: int = None):
         # ! Ordered by speed for performance
         if worker.position == target_position:
             return False  # * cannot move to self
 
-        if abs(target_position.x - worker.position.x) > 1:
+        if not target_position.is_adjacent(worker.position):
             return False  # * cannot move further than 1 tile (x)
-        if abs(target_position.y - worker.position.y) > 1:
-            return False  # * cannot move further than 1 tile (y)
 
-        if not self.validate_unoccupied_space(target_position):
+        if not self.check_unoccupied_space(target_position):
             return False  # * cannot move onto occupied space
 
-        if max_step_up >= 0 and self.get_tile(worker.position).stack_height + max_step_up >= self.get_tile(target_position).stack_height:
+        if max_step_up and self.get_tile(worker.position).stack_height + max_step_up < self.get_tile(target_position).stack_height:
             return False  # * cannot move if too high (-1 = skip)
-        if max_step_down >= 0 and self.get_tile(worker.position).stack_height - max_step_down <= self.get_tile(target_position).stack_height:
+        if max_step_down and self.get_tile(worker.position).stack_height - max_step_down > self.get_tile(target_position).stack_height:
             return False  # * cannot move if too low (-1 = skip)
 
         return True
@@ -76,12 +74,10 @@ class Game:
         if worker.position == target_position:
             return False  # * cannot buiild to self
 
-        if abs(target_position.x - worker.position.x) > 1:
-            return False  # * cannot build further than 1 tile (x)
-        if abs(target_position.y - worker.position.y) > 1:
-            return False  # * cannot buiild further than 1 tile (y)
+        if not target_position.is_adjacent(worker.position):
+            return False  # * cannot move further than 1 tile (x)
 
-        if not self.validate_unoccupied_space(target_position):
+        if not self.check_unoccupied_space(target_position):
             return False  # * cannot build onto occupied space
 
         return True

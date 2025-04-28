@@ -92,6 +92,11 @@ class Vector2I:
     def to_tuple(self):
         return (self.x, self.y)
 
+    def is_adjacent(self, v: "Vector2I") -> bool:
+        dx = abs(v.x - self.x)
+        dy = abs(v.y - self.y)
+        return max(dx, dy) <= 1
+    
     # ? Most likely won't need
     # # ! v2 = v1 * f
     # def __mul__(self, scalar: int) -> "Vector2I":
