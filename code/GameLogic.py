@@ -5,8 +5,9 @@ from Player import Player
 from Worker import Worker
 from LogicTile import LogicTile
 
+
 class Game:
-    #ensure number of players = number of gods
+    # ensure number of players = number of gods
     def __init__(self, player_count: int, size: Vector2I):
         self.size = size
         self._grid: list[list[LogicTile]] = [
@@ -38,6 +39,53 @@ class Game:
     def get_tile(self, position: Vector2I):
         return self._grid[position.x][position.y]
 
+    def validate_unoccupied_space(self, position: Vector2I):
+        """
+        From rulesheet: Unoccupied Space: A space not containing a worker or dome.
+        """
+        if self.get_tile(position).stack_height >= SettingManager.stacks_before_dome+1:
+            return False  # * dome check
+
+        if self.get_tile(position).worker:
+            return False  # * worker check
+
+        return True
+
+    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: int = -1):
+        # ! Ordered by speed for performance
+        if worker.position == target_position:
+            return False  # * cannot move to self
+
+        if abs(target_position.x - worker.position.x) > 1:
+            return False  # * cannot move further than 1 tile (x)
+        if abs(target_position.y - worker.position.y) > 1:
+            return False  # * cannot move further than 1 tile (y)
+
+        if not self.validate_unoccupied_space(target_position):
+            return False  # * cannot move onto occupied space
+
+        if max_step_up >= 0 and self.get_tile(worker.position).stack_height + max_step_up >= self.get_tile(target_position).stack_height:
+            return False  # * cannot move if too high (-1 = skip)
+        if max_step_down >= 0 and self.get_tile(worker.position).stack_height - max_step_down <= self.get_tile(target_position).stack_height:
+            return False  # * cannot move if too low (-1 = skip)
+
+        return True
+
+    def validate_build_position(self, worker: Worker, target_position: Vector2I):
+        # ! Ordered by speed for performance
+        if worker.position == target_position:
+            return False  # * cannot buiild to self
+
+        if abs(target_position.x - worker.position.x) > 1:
+            return False  # * cannot build further than 1 tile (x)
+        if abs(target_position.y - worker.position.y) > 1:
+            return False  # * cannot buiild further than 1 tile (y)
+
+        if not self.validate_unoccupied_space(target_position):
+            return False  # * cannot build onto occupied space
+
+        return True
+
     def move_worker(self, worker: Worker, new_position: Vector2I):
         old_tile = self.get_tile(worker.position) if worker.position else None
         new_tile = self.get_tile(new_position)
@@ -50,4 +98,3 @@ class Game:
     def add_stack(self, position: Vector2I):
         tile = self.get_tile(position)
         tile.stack_height += 1
-    
