@@ -4,6 +4,7 @@ from MathLib.Vector import Vector2I
 from Worker import Worker
 from Styles import *
 
+
 class Tile:
     """
     Defaults are what a tile is before anything happens on them.
@@ -14,7 +15,7 @@ class Tile:
     def __init__(self, parent_frame: Frame, position: Vector2I, on_click_callback: Callable[[Event], None]) -> None:
         # ! Gameplay Data
         self.position: Vector2I = position
-        self.stack_height: int = 15
+        self.stack_height_px: int = 15
         # ! Sprite / Data
         # ? Note: some of this might be better suited in styles
         self.stack_sprites: List[int] = []
@@ -40,20 +41,20 @@ class Tile:
         # * Stacks
         stack_widths = (40, 30, 20)
         self.stack_sprites = [
-            self.canvas.create_rectangle(canvas_centre + stack_widths[0], stack_grow_from_y - self.stack_height*0,
+            self.canvas.create_rectangle(canvas_centre + stack_widths[0], stack_grow_from_y - self.stack_height_px*0,
                                          canvas_centre -
                                          stack_widths[0], stack_grow_from_y -
-                                         self.stack_height*1,
+                                         self.stack_height_px*1,
                                          fill=STACK_COLOUR),
-            self.canvas.create_rectangle(canvas_centre + stack_widths[1], stack_grow_from_y - self.stack_height*1,
+            self.canvas.create_rectangle(canvas_centre + stack_widths[1], stack_grow_from_y - self.stack_height_px*1,
                                          canvas_centre -
                                          stack_widths[1], stack_grow_from_y -
-                                         self.stack_height*2,
+                                         self.stack_height_px*2,
                                          fill=STACK_COLOUR),
-            self.canvas.create_rectangle(canvas_centre + stack_widths[2], stack_grow_from_y - self.stack_height*2,
+            self.canvas.create_rectangle(canvas_centre + stack_widths[2], stack_grow_from_y - self.stack_height_px*2,
                                          canvas_centre -
                                          stack_widths[2], stack_grow_from_y -
-                                         self.stack_height*3,
+                                         self.stack_height_px*3,
                                          fill=STACK_COLOUR)
         ]
         for sprite in self.stack_sprites:
@@ -66,21 +67,19 @@ class Tile:
         # * Dome
         dome_width = 20
         self.dome_sprite = self.canvas.create_arc(canvas_centre + dome_width,
-                                                  stack_grow_from_y - self.stack_height*2,
+                                                  stack_grow_from_y - self.stack_height_px*2,
                                                   canvas_centre - dome_width,
-                                                  stack_grow_from_y - self.stack_height*4,
+                                                  stack_grow_from_y - self.stack_height_px*4,
                                                   start=0, extent=180, fill=DOME_COLOUR)
         self.canvas.itemconfig(self.dome_sprite, state=HIDDEN)
 
         # * Worker (colour change for different players)
-        worker_pos_y = stack_grow_from_y - \
-            self.stack_height*3  # change this for each stack
-        worker_width = 10
-        worker_height = 40
-        self.worker_sprite = self.canvas.create_oval(canvas_centre + worker_width,
+        worker_pos_y = stack_grow_from_y
+
+        self.worker_sprite = self.canvas.create_oval(canvas_centre + WORKER_WIDTH_PX,
                                                      worker_pos_y,
-                                                     canvas_centre - worker_width,
-                                                     worker_pos_y - worker_height,
+                                                     canvas_centre - WORKER_WIDTH_PX,
+                                                     worker_pos_y - WORKER_HEIGHT_PX,
                                                      fill=DEBUG_ERR_COLOUR)
         self.canvas.itemconfig(self.worker_sprite, state=HIDDEN)
 

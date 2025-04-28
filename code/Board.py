@@ -1,7 +1,7 @@
 from MathLib.Vector import Vector2I
 from Tile import Tile
 from Worker import Worker
-from TileLogic import LogicTile
+from LogicTile import LogicTile
 
 
 class Board:

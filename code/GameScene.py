@@ -8,7 +8,7 @@ from Styles import *
 from God import God
 from Player import Player
 from Tile import Tile
-from TileLogic import LogicTile
+from LogicTile import LogicTile
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
@@ -30,15 +30,16 @@ class GameScene(Scene):
         self._grid: Optional[list[list[Tile]]] = None
 
         self.map_frame: Frame = Frame(
-            self.frame, 
-            width=SettingManager.map_frame_size.x, 
-            height=SettingManager.map_frame_size.y, 
-            bg=DIRT_COLOUR, highlightthickness=15, 
+            self.frame,
+            width=SettingManager.map_frame_size.x,
+            height=SettingManager.map_frame_size.y,
+            bg=DIRT_COLOUR, highlightthickness=15,
             highlightbackground=SAND_COLOUR)
-        
+
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        self.current_phase = "select_worker" # can be select_worker, move_worker, build_stack
+        # can be select_worker, move_worker, build_stack
+        self.current_phase = "select_worker"
 
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
@@ -69,8 +70,10 @@ class GameScene(Scene):
                     f"[DEBUG] Moving worker {self.selected_worker.player_id} to {position.x}-{position.y}")
                 old_position = self.selected_worker.position
 
-                GameManager.current_game.move_worker(self.selected_worker, position)
-                self.move_worker_visual(self.selected_worker, old_position, position)
+                GameManager.current_game.move_worker(
+                    self.selected_worker, position)
+                self.move_worker_visual(
+                    self.selected_worker, old_position, position)
 
                 self.current_phase = "build_stack"
 
@@ -79,7 +82,8 @@ class GameScene(Scene):
 
             GameManager.current_game.add_stack(position)  # Update logic first
 
-            logic_tile = GameManager.current_game.get_tile(position)  # Get logic tile
+            logic_tile = GameManager.current_game.get_tile(
+                position)  # Get logic tile
             # Use real level to update visuals
             self.change_stack_visuals(position, logic_tile.stack_height)
 
@@ -100,25 +104,27 @@ class GameScene(Scene):
             else:
                 tile.canvas.itemconfigure(tile.stack_sprites[i], state=HIDDEN)
 
+        tile.canvas.itemconfigure(tile.dome_sprite, state=(
+            NORMAL if stack_count == SettingManager.stacks_before_dome + 1 else HIDDEN))
+
+        # ! Note: this will still place a worker above a dome even if that is not allowed (this should not need to check)
         worker_centre_x = tile.scaled_tile_size.x // 2
         worker_centre_y = tile.scaled_tile_size.y - \
-            tile.stack_grow_bottom_offset - tile.stack_height * stack_count
-
-        worker_width = 10
-        worker_height = 40
+            tile.stack_grow_bottom_offset - tile.stack_height_px * stack_count
 
         tile.canvas.coords(
             tile.worker_sprite,
-            worker_centre_x + worker_width,
+            worker_centre_x + WORKER_WIDTH_PX,
             worker_centre_y,
-            worker_centre_x - worker_width,
-            worker_centre_y - worker_height)
+            worker_centre_x - WORKER_WIDTH_PX,
+            worker_centre_y - WORKER_HEIGHT_PX)  # ! may need to scale with ui scaling
 
     def start_game(self, grid_size: Vector2I):
         assert grid_size.x > 0
         assert grid_size.y > 0
         self.size = grid_size
-        self._grid = [[Tile(self.map_frame, Vector2I(x, y), lambda e, pos=Vector2I(x, y): self.__on_clicked_tile(pos, e)) for y in range(self.size.y)] for x in range(self.size.x)]
+        self._grid = [[Tile(self.map_frame, Vector2I(x, y), lambda e, pos=Vector2I(
+            x, y): self.__on_clicked_tile(pos, e)) for y in range(self.size.y)] for x in range(self.size.x)]
 
         # Randomly place workers
         self.place_random_workers()
@@ -149,14 +155,14 @@ class GameScene(Scene):
         new_tile = self.get_tile(new_position)
 
         # Hide old tile sprite unconditionally
-        old_tile.canvas.itemconfig(old_tile.worker_sprite, state="hidden")
+        old_tile.canvas.itemconfig(old_tile.worker_sprite, state=HIDDEN)
 
         # Show new tile sprite if logic says there's a worker
         logic_tile = GameManager.current_game.get_tile(new_position)
         if logic_tile.worker:
-            new_tile.canvas.itemconfig(new_tile.worker_sprite, state="normal")
+            new_tile.canvas.itemconfig(new_tile.worker_sprite, state=NORMAL)
         else:
-            new_tile.canvas.itemconfig(new_tile.worker_sprite, state="hidden")
+            new_tile.canvas.itemconfig(new_tile.worker_sprite, state=HIDDEN)
 
     def cleanup(self):
         # TODO reset everything
