@@ -10,8 +10,11 @@ class Vector2:
     def __str__(self) -> str:
         return f"({self.x}, {self.y})"
 
+    def magnitude_squared(self) -> float:
+        return self.x**2 + self.y**2
+
     def magnitude(self) -> float:
-        return sqrt(self.x**2 + self.y**2)
+        return sqrt(self.magnitude_squared())
 
     def normalise(self):
         mag = self.magnitude()
@@ -80,9 +83,20 @@ class Vector2I:
     def __sub__(self, other: "Vector2I") -> "Vector2I":
         return Vector2I(self.x - other[0], self.y - other[1])
 
+    def magnitude_squared(self) -> float:
+        return self.x**2 + self.y**2
+
+    def magnitude(self) -> float:
+        return sqrt(self.magnitude_squared())
+
     def to_tuple(self):
         return (self.x, self.y)
 
+    def is_adjacent(self, v: "Vector2I") -> bool:
+        dx = abs(v.x - self.x)
+        dy = abs(v.y - self.y)
+        return max(dx, dy) <= 1
+    
     # ? Most likely won't need
     # # ! v2 = v1 * f
     # def __mul__(self, scalar: int) -> "Vector2I":

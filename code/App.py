@@ -1,6 +1,6 @@
 import tkinter as tk
 
-import Game
+import GameScene as GameScene
 from SceneID import SceneID
 from SettingManager import SettingManager
 from SceneSystem.SceneManager import SceneManager
@@ -26,15 +26,9 @@ if __name__ == "__main__":
     # region Generate and Register Scenes
     SceneManager.register_scene(SceneID.TITLE,  Scenes.Title(ROOT))
     SceneManager.register_scene(SceneID.MAIN_MENU,  Scenes.MainMenu(ROOT))
-
     SceneManager.register_scene(SceneID.PRE_GAME,  Scenes.PreGame(ROOT))
-
-    SceneManager.register_scene(SceneID.PRE_GAME, Scenes.PreGame(ROOT))
-    SceneManager.register_scene(SceneID.GAME, Game.GameScene(
-        ROOT, SettingManager.map_frame_size))
-    SceneManager.register_scene(
-        SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
-
+    SceneManager.register_scene(SceneID.GAME, GameScene.GameScene(ROOT))
+    SceneManager.register_scene(SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
     SceneManager.register_scene(SceneID.RULEBOOK, Scenes.RuleBook(ROOT))
     # endregion
 
