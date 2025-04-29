@@ -5,6 +5,7 @@ from SettingManager import SettingManager
 from Player import Player
 from Worker import Worker
 from LogicTile import LogicTile
+from TurnManager import TurnManager
 
 
 class Game:
@@ -17,6 +18,7 @@ class Game:
         ]
         self.players: list[Player] = []
         self.initialize_players(player_count)
+        self.turn_manager = TurnManager(self.players)
 
     def initialize_players(self, count: int):
         self.players.clear()
@@ -100,3 +102,9 @@ class Game:
     def add_stack(self, position: Vector2I):
         tile = self.get_tile(position)
         tile.stack_height += 1
+
+    def get_current_player(self) -> Player:
+        return self.turn_manager.get_current_player()
+    
+    def end_turn(self) -> None:
+        self.turn_manager.end_turn()

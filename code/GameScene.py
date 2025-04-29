@@ -1,5 +1,5 @@
 import random
-from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame
+from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame, Label
 from typing import Callable, List, Optional, Tuple
 from MathLib.Vector import Vector2I
 from SettingManager import SettingManager
@@ -46,6 +46,8 @@ class GameScene(Scene):
 
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
+        self.show_player_turn_popup()
+        self.highlight_current_players_workers()
 
     def on_exit_scene(self):
         self.cleanup()
@@ -63,10 +65,17 @@ class GameScene(Scene):
         match self.current_phase:
             case Phase.SELECT_WORKER:
                 if logic_tile.worker:
-                    print(
-                        f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
-                    self.selected_worker = logic_tile.worker
-                    self.current_phase = Phase.MOVE_WORKER
+                    current_player = GameManager.get_game().get_current_player()
+                    #Check if the worker the player is trying to select is the current player's worker
+                    if logic_tile.worker.player_id == current_player.id:  
+                        print(
+                            f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
+                        self.selected_worker = logic_tile.worker
+                        self.show_worker_selected_popup()
+                        self.current_phase = Phase.MOVE_WORKER
+                    else:
+                        self.show_cannot_select_worker_popup()
+                        print(f"[DEBUG] Cannot select other player's worker.")
                 else:
                     print(
                         f"[DEBUG] No worker found on tile {position.x}-{position.y}.")
@@ -85,6 +94,7 @@ class GameScene(Scene):
                         self.move_worker_visual(
                             self.selected_worker, old_position, position)
                         self.current_phase = Phase.BUILD_STACK
+                        self.show_build_popup()
 
                 # ! Note: "You win immediately if one of your workers moves from a lover level up to a level 3 tower"
                 if GameManager.current_game.check_if_winning_tile(position):
@@ -103,8 +113,11 @@ class GameScene(Scene):
                         self.change_stack_visuals(
                             position, logic_tile.stack_height)  # Update visuals
 
+                        GameManager.get_game().end_turn()
                         self.current_phase = Phase.SELECT_WORKER
                         self.selected_worker = None
+                        self.show_player_turn_popup()
+                        self.highlight_current_players_workers()
 
             case _:
                 raise Exception("Invalid game phase.")
@@ -189,3 +202,97 @@ class GameScene(Scene):
         # TODO reset UI
         self.size = None
         self._grid = None
+
+    def show_player_turn_popup(self):
+        current_player = GameManager.get_game().get_current_player()
+        popup = Label(
+            self.frame,
+            text=f"Player {current_player.id}'s Turn!",
+            font=("Helvetica", 18, "bold"),
+            bg="#FFFACD",  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 2 seconds
+        self.frame.after(2000, popup.destroy)
+
+    def show_cannot_select_worker_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"Cannot select another player's worker!",
+            font=("Helvetica", 18, "bold"),
+            bg="#FFFACD",  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 2 seconds
+        self.frame.after(2000, popup.destroy)
+
+    def highlight_current_players_workers(self):
+        assert self._grid
+
+        # First remove any old highlights
+        for row in self._grid:
+            for tile in row:
+                tile.canvas.itemconfig(tile.worker_sprite, outline="", width=1)
+
+        # Highlight current player's workers
+        current_player = GameManager.get_game().get_current_player()
+
+        for worker in current_player.workers:
+            tile = self.get_tile(worker.position)
+
+            tile.canvas.itemconfig(
+                tile.worker_sprite,
+                outline="gold",  # ✅ bright gold border
+                width=5           # ✅ THICK border, very visible
+            )
+
+    def show_worker_selected_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"Worker Selected!",
+            font=("Helvetica", 18, "bold"),
+            bg="#FFFACD",  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 2 seconds
+        self.frame.after(2000, popup.destroy)
+
+    def show_build_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"Worker Moved! Click on an adjacent tile to build...",
+            font=("Helvetica", 18, "bold"),
+            bg="#FFFACD",  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 2 seconds
+        self.frame.after(2000, popup.destroy)
+
+
+
+
+
