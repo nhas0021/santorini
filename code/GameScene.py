@@ -104,6 +104,9 @@ class GameScene(Scene):
 
                         self.current_phase = Phase.BUILD_STACK   
 
+                    else:
+                        self.show_invalid_movement_popup()
+
             case Phase.BUILD_STACK:
                 print(f"[DEBUG] Building on tile at {position.x}-{position.y}")
 
@@ -121,6 +124,8 @@ class GameScene(Scene):
                         self.selected_worker = None
                         self.show_player_turn_popup()
                         self.highlight_current_players_workers()
+                    else:
+                        self.show_invalid_build_popup()
 
             case _:
                 raise Exception("Invalid game phase.")
@@ -296,6 +301,40 @@ class GameScene(Scene):
 
         # Auto-destroy popup after 2 seconds
         self.frame.after(2000, popup.destroy)
+
+    def show_invalid_movement_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"Worker cannot be moved here! Please try Again.",
+            font=("Helvetica", 18, "bold"),
+            bg="#FFFACD",  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 1 second
+        self.frame.after(1000, popup.destroy)
+
+    def show_invalid_build_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"Cannot build here! Please try Again.",
+            font=("Helvetica", 18, "bold"),
+            bg="#FFFACD",  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 1 second
+        self.frame.after(1000, popup.destroy)
 
 
 
