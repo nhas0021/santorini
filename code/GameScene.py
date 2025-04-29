@@ -45,10 +45,27 @@ class GameScene(Scene):
         # can be select_worker, move_worker, build_stack
         self.current_phase: Phase = Phase.SELECT_WORKER
 
+        #show the current game phase
+        self.info_panel = Frame(self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
+        self.info_panel.place(relx=0.05, rely=0.5, anchor="w")
+
+        # Label inside the info panel
+        self.phase_info_label = Label(
+            self.info_panel,
+            text="",
+            font=("Helvetica", 12, "bold"),
+            bg=POP_UP_COLOR,
+            fg="#333",
+            wraplength=180,
+            justify="center"
+        )
+        self.phase_info_label.place(relx=0.5, rely=0.5, anchor="center")
+
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
         self.show_player_turn_popup()
         self.highlight_current_players_workers()
+        self.update_phase_info()
 
     def on_exit_scene(self):
         self.cleanup()
@@ -74,6 +91,7 @@ class GameScene(Scene):
                         self.selected_worker = logic_tile.worker
                         self.show_worker_selected_popup()
                         self.current_phase = Phase.MOVE_WORKER
+                        self.update_phase_info()
                     else:
                         self.show_cannot_select_worker_popup()
                         print(f"[DEBUG] Cannot select other player's worker.")
@@ -102,7 +120,8 @@ class GameScene(Scene):
                         
                         self.show_build_popup()
 
-                        self.current_phase = Phase.BUILD_STACK   
+                        self.current_phase = Phase.BUILD_STACK
+                        self.update_phase_info()   
 
                     else:
                         self.show_invalid_movement_popup()
@@ -122,6 +141,7 @@ class GameScene(Scene):
                         GameManager.get_game().end_turn()
                         self.current_phase = Phase.SELECT_WORKER
                         self.selected_worker = None
+                        self.update_phase_info()
                         self.show_player_turn_popup()
                         self.highlight_current_players_workers()
                     else:
@@ -219,7 +239,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Player {current_player.id}'s Turn!",
             font=("Helvetica", 18, "bold"),
-            bg="#FFFACD",  # light yellow
+            bg= POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -228,15 +248,15 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 2 seconds
-        self.frame.after(2000, popup.destroy)
+        # Auto-destroy popup after 1.5 second
+        self.frame.after(1500, popup.destroy)
 
     def show_cannot_select_worker_popup(self):
         popup = Label(
             self.frame,
             text=f"Cannot select another player's worker!",
             font=("Helvetica", 18, "bold"),
-            bg="#FFFACD",  # light yellow
+            bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -245,8 +265,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 2 seconds
-        self.frame.after(2000, popup.destroy)
+        # Auto-destroy popup after 1.5 seconds
+        self.frame.after(1500, popup.destroy)
 
     def highlight_current_players_workers(self):
         assert self._grid
@@ -264,8 +284,8 @@ class GameScene(Scene):
 
             tile.canvas.itemconfig(
                 tile.worker_sprite,
-                outline="gold",  # ✅ bright gold border
-                width=5           # ✅ THICK border, very visible
+                outline="gold",
+                width=5           
             )
 
     def show_worker_selected_popup(self):
@@ -273,7 +293,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Worker Selected!",
             font=("Helvetica", 18, "bold"),
-            bg="#FFFACD",  # light yellow
+            bg= POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -282,15 +302,15 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 2 seconds
-        self.frame.after(2000, popup.destroy)
+        # Auto-destroy popup after 1.5 seconds
+        self.frame.after(1500, popup.destroy)
 
     def show_build_popup(self):
         popup = Label(
             self.frame,
             text=f"Worker Moved! Click on an adjacent tile to build...",
             font=("Helvetica", 18, "bold"),
-            bg="#FFFACD",  # light yellow
+            bg= POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -299,15 +319,15 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 2 seconds
-        self.frame.after(2000, popup.destroy)
+        # Auto-destroy popup after 1.5 seconds
+        self.frame.after(1500, popup.destroy)
 
     def show_invalid_movement_popup(self):
         popup = Label(
             self.frame,
             text=f"Worker cannot be moved here! Please try Again.",
             font=("Helvetica", 18, "bold"),
-            bg="#FFFACD",  # light yellow
+            bg= POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -324,7 +344,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Cannot build here! Please try Again.",
             font=("Helvetica", 18, "bold"),
-            bg="#FFFACD",  # light yellow
+            bg= POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -335,6 +355,23 @@ class GameScene(Scene):
 
         # Auto-destroy popup after 1 second
         self.frame.after(1000, popup.destroy)
+    
+    def update_phase_info(self):
+        current_player = GameManager.get_game().get_current_player()
+        text = f"Player {current_player.id}'s Turn\n\n"
+
+        match self.current_phase:
+            case Phase.SELECT_WORKER:
+                text += "Select one of your workers"
+            case Phase.MOVE_WORKER:
+                text += "Move the selected worker"
+            case Phase.BUILD_STACK:
+                text += "Build on an adjacent tile"
+            case _:
+                text += "Waiting..."
+
+        self.phase_info_label.config(text=text)
+
 
 
 

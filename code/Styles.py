@@ -24,6 +24,7 @@ GRASS_COLOUR: str = "#6aa84f"
 STACK_COLOUR: str = "#fbfbfb"
 DOME_COLOUR: str = "#dadada"
 PLAYER_COLORS = ["#f44336", "#2986cc", "#f6b26b"]  # red, blue, orange
+POP_UP_COLOR: str = "#FFFACD"
 
 # ~ Game Sizes
 # * These are the sizes at 1920x1080 (native), which can then be scaled
