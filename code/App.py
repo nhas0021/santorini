@@ -30,6 +30,7 @@ if __name__ == "__main__":
     SceneManager.register_scene(SceneID.GAME, GameScene.GameScene(ROOT))
     SceneManager.register_scene(SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
     SceneManager.register_scene(SceneID.RULEBOOK, Scenes.RuleBook(ROOT))
+    SceneManager.register_scene(SceneID.GAME_OVER, Scenes.GameOver(ROOT))
     # endregion
 
     # region Start Application

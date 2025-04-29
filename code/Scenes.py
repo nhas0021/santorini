@@ -330,3 +330,50 @@ class RuleBook(Scene):
             command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
         )
         self.back_button.pack(pady=20)
+
+class GameOver(Scene):
+    def __init__(self, root: tk.Tk):
+        super().__init__(root)
+        self.frame.config(background=WHITE)
+
+        # Title
+        self.title_label = tk.Label(
+            self.frame,
+            text="Game Over",
+            font=("Georgia", 36, "bold"),
+            bg="#ffffff",
+            fg="#FF0000"
+        )
+        self.title_label.pack(pady=40)
+
+        # Winner label (created once here)
+        self.winner_label = tk.Label(
+            self.frame,
+            text="",  # Will be set later
+            font=("Helvetica", 24, "bold"),
+            bg="#ffffff",
+            fg="#2E8B57"
+        )
+        self.winner_label.pack(pady=20)
+
+        # Return to Main Menu button
+        self.main_menu_button = tk.Button(
+            self.frame,
+            text="Return to Main Menu",
+            font=("Helvetica", 16),
+            bg="#ADD8E6",
+            fg="black",
+            padx=20,
+            pady=10,
+            command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
+        )
+        self.main_menu_button.pack(pady=30)
+
+    def on_enter_scene(self):
+        winner = GameManager.get_game().get_current_player()
+        self.winner_label.config(
+            text=f"🎉 Player {winner.id} Wins! 🎉"
+        )
+
+
+

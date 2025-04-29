@@ -12,6 +12,7 @@ from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
 from GameManager import GameManager
 from Worker import Worker
+from SceneID import SceneID
 
 
 class Phase(Enum):
@@ -93,13 +94,15 @@ class GameScene(Scene):
                             self.selected_worker, position)
                         self.move_worker_visual(
                             self.selected_worker, old_position, position)
-                        self.current_phase = Phase.BUILD_STACK
+                            
+                        # ! Note: "You win immediately if one of your workers moves from a lover level up to a level 3 tower"
+                        if GameManager.current_game.check_if_winning_tile(position):
+                            print("GAME WON")  # TODO what happens after win
+                            SceneManager.change_scene(SceneID.GAME_OVER)
+                        
                         self.show_build_popup()
 
-                # ! Note: "You win immediately if one of your workers moves from a lover level up to a level 3 tower"
-                if GameManager.current_game.check_if_winning_tile(position):
-                    print("GAME WON")  # TODO what happens after win
-                    raise NotImplementedError
+                        self.current_phase = Phase.BUILD_STACK   
 
             case Phase.BUILD_STACK:
                 print(f"[DEBUG] Building on tile at {position.x}-{position.y}")
@@ -202,6 +205,8 @@ class GameScene(Scene):
         # TODO reset UI
         self.size = None
         self._grid = None
+        self.selected_worker = None
+        self.current_phase = Phase.SELECT_WORKER
 
     def show_player_turn_popup(self):
         current_player = GameManager.get_game().get_current_player()

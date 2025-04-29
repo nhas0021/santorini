@@ -11,3 +11,4 @@ class SceneID(BaseSceneID, Enum):
     GAME = 6
     SETTINGS = 7
     GOD_ASSIGNMENT = 8
+    GAME_OVER = 9
