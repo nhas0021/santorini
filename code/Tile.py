@@ -7,6 +7,7 @@ from Styles import *
 
 class Tile:
     """
+    Tile UI (logic is in LogicTile)
     Defaults are what a tile is before anything happens on them.
 
     This tile generates the shapes instead of compositing using images, this for sprint 2 (to be changed in sprint 3)
