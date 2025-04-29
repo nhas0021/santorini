@@ -90,6 +90,7 @@ class GameScene(Scene):
                             f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
                         self.selected_worker = logic_tile.worker
                         self.show_worker_selected_popup()
+                        self.highlight_selected_worker()
                         self.current_phase = Phase.MOVE_WORKER
                         self.update_phase_info()
                     else:
@@ -119,7 +120,7 @@ class GameScene(Scene):
                             SceneManager.change_scene(SceneID.GAME_OVER)
                         
                         self.show_build_popup()
-
+                        self.highlight_selected_worker()
                         self.current_phase = Phase.BUILD_STACK
                         self.update_phase_info()   
 
@@ -287,6 +288,23 @@ class GameScene(Scene):
                 outline="gold",
                 width=5           
             )
+
+    def highlight_selected_worker(self):
+        # Remove old highlights first
+        for row in self._grid:
+            for tile in row:
+                tile.canvas.itemconfig(tile.worker_sprite, outline="", width=1)
+
+        if not self.selected_worker:
+            return
+
+        # Highlight the selected worker
+        tile = self.get_tile(self.selected_worker.position)
+        tile.canvas.itemconfig(
+            tile.worker_sprite,
+            outline="red",  # Use blue or any visible color
+            width=5
+        )
 
     def show_worker_selected_popup(self):
         popup = Label(
