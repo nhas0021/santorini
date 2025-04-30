@@ -490,7 +490,7 @@ class GameScene(Scene):
         popup = Toplevel(self.frame)
         popup.title("Player Eliminated")
         popup.geometry("450x250")
-        popup.configure(bg="white")
+        popup.configure(bg=WHITE)
         popup.grab_set()  # Prevent interaction with main window
 
         # Header
@@ -499,7 +499,7 @@ class GameScene(Scene):
             text=f"Player {player_id} has been eliminated!",
             font=(FONT_GENERAL, 18, "bold"),
             fg="#FF0000",
-            bg="white"
+            bg=WHITE
         )
         title.pack(pady=(20, 10))
 
@@ -508,7 +508,7 @@ class GameScene(Scene):
             popup,
             text=f"Reason: {reason}",
             font=(FONT_GENERAL, 14),
-            bg="white",
+            bg=WHITE,
             wraplength=400,
             justify="center"
         )

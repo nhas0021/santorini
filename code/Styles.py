@@ -6,6 +6,8 @@ from typing import Callable
 from MathLib.Vector import Vector2I
 
 # region Colours
+WHITE: str = "#FFFFFF"
+BLACK: str = "#000000"
 # region Debug
 DEBUG_ERR_COLOUR: str = "magenta"
 DEBUG_SPRITE_OUTLINE_COLOUR: str = "red1"
@@ -15,12 +17,6 @@ DEBUG_SPRITE_AREA_COLOUR: str = "green1"
 # ~ Game Colors
 BG_COLOUR: str = "#22223B"
 BG_SUB_COLOUR: str = "#4A4E69"
-
-TEXT_COLOUR: str = "#F2E9E4"
-
-WHITE: str = "#FFFFFF"
-BLACK: str = "#000000"
-
 
 WATER_COLOUR: str = "#0b5394"
 SAND_COLOUR: str = "#ffe599"
@@ -59,11 +55,14 @@ def generate_main_menu_button_positive(parent_frame: Frame, text: str, on_click_
         parent_frame,
         text=text,
         font=(FONT_MAIN_MENU_BUTTON, 20),
-        bg="#90EE90",                                                # light green
-        fg="darkgreen",                                              # text color
+        # light green
+        bg="#90EE90",
+        # text color
+        fg="darkgreen",
         # hover background color
         activebackground="#77DD77",
-        activeforeground="white",                                    # hover text color
+        # hover text color
+        activeforeground="white",
         borderwidth=4,
         # border color (macOS/Linux)
         highlightbackground="darkgreen",
@@ -82,11 +81,14 @@ def generate_main_menu_button_negative(parent_frame: Frame, text: str, on_click_
         parent_frame,
         text=text,
         font=(FONT_MAIN_MENU_BUTTON, 20),
-        bg="#FF7F7F",                                                # light red
-        fg="BLACK",                                                  # text color
+        # light red
+        bg="#FF7F7F",
+        # text color
+        fg="BLACK",
         # hover background color
         activebackground="coral1",
-        activeforeground="white",                                    # hover text color
+        # hover text color
+        activeforeground="white",
         borderwidth=4,
         # makes the border visible
         relief="solid",

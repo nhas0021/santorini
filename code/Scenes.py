@@ -76,7 +76,7 @@ class PreGame(Scene):
             self.frame,
             text="Santorini - Game Setup",
             font=(FONT_TITLE, 32, "bold"),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#2E2E2E"
         )
         self.title_label.pack(pady=30)
@@ -86,7 +86,7 @@ class PreGame(Scene):
             self.frame,
             text=f"Number of Players: {SettingManager.player_count}\nGrid Size: {SettingManager.grid_size.x} x {SettingManager.grid_size.y}",
             font=(FONT_GENERAL, 16),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#333333",
             justify="center"
         )
@@ -97,7 +97,7 @@ class PreGame(Scene):
             self.frame,
             text="Click below to assign gods and start the game.",
             font=(FONT_GENERAL, 14),
-            bg="#ffffff"
+            bg=WHITE
         )
         self.instructions_label.pack(pady=10)
 
@@ -107,7 +107,7 @@ class PreGame(Scene):
             text="Attain God Powers",
             font=(FONT_GENERAL, 16, "bold"),
             bg="#4CAF50",
-            fg="white",
+            fg=WHITE,
             padx=20,
             pady=10,
             command=self.start_god_assignment
@@ -120,7 +120,7 @@ class PreGame(Scene):
             text="Back to Main Menu",
             font=(FONT_GENERAL, 16),
             bg="#FF7F7F",
-            fg="white",
+            fg=WHITE,
             padx=20,
             pady=10,
             command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
@@ -143,7 +143,7 @@ class GodAssignment(Scene):
             self.frame,
             text="God Assignment",
             font=(FONT_TITLE, 28, "bold"),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#2E2E2E"
         )
         self.title_label.pack(pady=30)
@@ -152,7 +152,7 @@ class GodAssignment(Scene):
             self.frame,
             text="Gods are being assigned randomly to players...",
             font=(FONT_GENERAL, 14),
-            bg="#ffffff"
+            bg=WHITE
         )
         self.info_label.pack(pady=10)
 
@@ -161,14 +161,14 @@ class GodAssignment(Scene):
             text="Assign Gods",
             font=(FONT_GENERAL, 16, "bold"),
             bg="#4CAF50",
-            fg="white",
+            fg=WHITE,
             padx=20,
             pady=10,
             command=self.assign_gods
         )
         self.assign_button.pack(pady=30)
 
-        self.result_frame = tk.Frame(self.frame, bg="#ffffff")
+        self.result_frame = tk.Frame(self.frame, bg=WHITE)
         self.result_frame.pack(pady=10)
 
         self.start_game_button = tk.Button(
@@ -176,7 +176,7 @@ class GodAssignment(Scene):
             text="Start Game",
             font=(FONT_GENERAL, 16, "bold"),
             bg="#1E88E5",
-            fg="white",
+            fg=WHITE,
             padx=20,
             pady=10,
             command=lambda: SceneManager.change_scene(SceneID.GAME)
@@ -190,7 +190,7 @@ class GodAssignment(Scene):
             text="Back to Pre-Game",
             font=(FONT_GENERAL, 16),
             bg="#FF7F7F",
-            fg="white",
+            fg=WHITE,
             padx=20,
             pady=10,
             command=lambda: SceneManager.change_scene(SceneID.PRE_GAME)
@@ -211,7 +211,7 @@ class GodAssignment(Scene):
                 self.result_frame,
                 text=f"Player {player.id} ➝ {player.god.name}",
                 font=(FONT_GENERAL, 14),
-                bg="#ffffff",
+                bg=WHITE,
                 fg="#333333"
             )
             player_label.pack(anchor="w", pady=5)
@@ -233,7 +233,7 @@ class RuleBook(Scene):
             self.frame,
             text="Rule Book",
             font=(FONT_TITLE, 28, "bold"),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#2E2E2E"
         )
         self.title_label.pack(pady=30)
@@ -243,7 +243,7 @@ class RuleBook(Scene):
             self.frame,
             wrap="word",
             font=(FONT_GENERAL, 14),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#333333",
             height=20,
             width=80
@@ -267,7 +267,7 @@ class RuleBook(Scene):
             text="Back to Main Menu",
             font=(FONT_GENERAL, 16),
             bg="#FF7F7F",
-            fg="white",
+            fg=WHITE,
             padx=20,
             pady=10,
             command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
@@ -284,7 +284,7 @@ class GameOver(Scene):
             self.frame,
             text="Game Over",
             font=(FONT_TITLE, 36, "bold"),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#FF0000"
         )
         self.title_label.pack(pady=40)
@@ -294,7 +294,7 @@ class GameOver(Scene):
             self.frame,
             text="",  # Will be set later
             font=(FONT_GENERAL, 24, "bold"),
-            bg="#ffffff",
+            bg=WHITE,
             fg="#2E8B57"
         )
         self.winner_label.pack(pady=20)
@@ -305,7 +305,7 @@ class GameOver(Scene):
             text="Return to Main Menu",
             font=(FONT_GENERAL, 16),
             bg="#ADD8E6",
-            fg="black",
+            fg=BLACK,
             padx=20,
             pady=10,
             command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
