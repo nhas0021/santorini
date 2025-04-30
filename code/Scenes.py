@@ -17,12 +17,12 @@ class Title (Scene):
         super().__init__(root)
 
         self.start_bg_button = tk.Button(
-            self.frame, bg=BG_COLOUR, borderwidth=0, command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU))
+            self.frame, bg=BG_COLOUR, activebackground=BG_SUB_COLOUR, borderwidth=0, text="Click anywhere to start...", font=(FONT_GENERAL, 36),  fg=WHITE, justify="center", command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU))
         self.start_bg_button.pack(fill="both", expand=True)
 
-        self._start_text = tk.Label(
-            self.frame, bg=BG_COLOUR, text="Click anywhere to start...", fg=WHITE, justify="center")
-        self._start_text.place(relx=0.5, rely=0.5, anchor="center")
+        # self._start_text = tk.Label(
+        #     self.frame, bg=BG_COLOUR, text="Click anywhere to start...", fg=WHITE, justify="center")
+        # self._start_text.place(relx=0.5, rely=0.5, anchor="center")
 
 
 class MainMenu(Scene):
@@ -42,19 +42,24 @@ class MainMenu(Scene):
         )
         self.text_title.place(relx=0.5, rely=0.1, anchor="center")
 
-        self.button_play = generate_main_menu_button_positive(self.frame, "Play", lambda: SceneManager.change_scene(SceneID.PRE_GAME))
+        self.button_play = generate_main_menu_button_positive(
+            self.frame, "Play", lambda: SceneManager.change_scene(SceneID.PRE_GAME))
         self.button_play.place(relx=0.2, rely=0.25, anchor="w")
 
-        self.button_tutorial = generate_main_menu_button_positive(self.frame, "Tutorial", lambda: SceneManager.change_scene(SceneID.TUTORIAL))
+        self.button_tutorial = generate_main_menu_button_positive(
+            self.frame, "Tutorial", lambda: SceneManager.change_scene(SceneID.TUTORIAL))
         self.button_tutorial.place(relx=0.2, rely=0.4, anchor="w")
 
-        self.button_rulebook = generate_main_menu_button_positive(self.frame, "Rule Book", lambda: SceneManager.change_scene(SceneID.RULEBOOK))
+        self.button_rulebook = generate_main_menu_button_positive(
+            self.frame, "Rule Book", lambda: SceneManager.change_scene(SceneID.RULEBOOK))
         self.button_rulebook.place(relx=0.2, rely=0.55, anchor="w")
 
-        self.button_settings = generate_main_menu_button_positive(self.frame, "Settings", lambda: SceneManager.change_scene(SceneID.SETTINGS))
+        self.button_settings = generate_main_menu_button_positive(
+            self.frame, "Settings", lambda: SceneManager.change_scene(SceneID.SETTINGS))
         self.button_settings.place(relx=0.2, rely=0.7, anchor="w")
 
-        self.button_quit = generate_main_menu_button_negative(self.frame, "Quit", root.destroy)
+        self.button_quit = generate_main_menu_button_negative(
+            self.frame, "Quit", root.destroy)
         self.button_quit.place(relx=0.2, rely=0.85, anchor="w")
 
         # image
@@ -274,6 +279,7 @@ class RuleBook(Scene):
         )
         self.back_button.pack(pady=20)
 
+
 class GameOver(Scene):
     def __init__(self, root: tk.Tk):
         super().__init__(root)
@@ -317,6 +323,3 @@ class GameOver(Scene):
         self.winner_label.config(
             text=f"🎉 Player {winner.id} Wins! 🎉"
         )
-
-
-
