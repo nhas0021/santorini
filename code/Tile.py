@@ -61,10 +61,6 @@ class Tile:
         for sprite in self.stack_sprites:
             self.canvas.itemconfig(sprite, state=HIDDEN)
 
-        stack_counter_text = self.canvas.create_text(
-            canvas_centre, self.scaled_tile_size.y - self.stack_grow_bottom_offset, anchor="s", text="?", justify="center", fill=TEXT_COLOUR)
-        self.canvas.itemconfig(stack_counter_text, state=HIDDEN)
-
         # * Dome
         dome_width = 20
         self.dome_sprite = self.canvas.create_arc(canvas_centre + dome_width,
