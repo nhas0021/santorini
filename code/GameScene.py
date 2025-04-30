@@ -45,8 +45,9 @@ class GameScene(Scene):
         # can be select_worker, move_worker, build_stack
         self.current_phase: Phase = Phase.SELECT_WORKER
 
-        #show the current game phase
-        self.info_panel = Frame(self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
+        # show the current game phase
+        self.info_panel = Frame(
+            self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
         self.info_panel.place(relx=0.05, rely=0.3, anchor="w")
 
         # Label inside the info panel
@@ -62,7 +63,8 @@ class GameScene(Scene):
         self.phase_info_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # Label for God info
-        self.god_panel = Frame(self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
+        self.god_panel = Frame(
+            self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
         self.god_panel.place(relx=0.05, rely=0.7, anchor="w")
 
         self.god_info_label = Label(
@@ -99,17 +101,18 @@ class GameScene(Scene):
         match self.current_phase:
             case Phase.SELECT_WORKER:
                 current_player = GameManager.get_game().get_current_player()
-                
+
                 if logic_tile.worker:
-                    #Check if the worker the player is trying to select is the current player's worker
-                    if logic_tile.worker.player_id == current_player.id:  
-                        
-                        #Check if the worker the player is trying to select can move
+                    # Check if the worker the player is trying to select is the current player's worker
+                    if logic_tile.worker.player_id == current_player.id:
+
+                        # Check if the worker the player is trying to select can move
                         if not GameManager.get_game().can_worker_move(logic_tile.worker):
                             print(f"[DEBUG] This worker cannot move!")
                             self.show_worker_cannot_move_popup()
                         else:
-                            print(f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
+                            print(
+                                f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
                             self.selected_worker = logic_tile.worker
                             self.show_worker_selected_popup()
                             self.highlight_selected_worker()
@@ -130,14 +133,18 @@ class GameScene(Scene):
                     logic_tile = GameManager.current_game.get_tile(position)
 
                     if GameManager.current_game.validate_move_position(self.selected_worker, position):
-                        print(f"[DEBUG] Moving worker to {position.x}-{position.y}")
-                        GameManager.current_game.move_worker(self.selected_worker, position)
-                        self.move_worker_visual(self.selected_worker, old_position, position)
+                        print(
+                            f"[DEBUG] Moving worker to {position.x}-{position.y}")
+                        GameManager.current_game.move_worker(
+                            self.selected_worker, position)
+                        self.change_stack_visuals(old_position)
+                        self.change_stack_visuals(position)
 
                         god = GameManager.get_game().get_current_player().god
                         proceed_to_build = True
                         if god:
-                            proceed_to_build = god.on_worker_moved(self.selected_worker, old_position, position, self)
+                            proceed_to_build = god.on_worker_moved(
+                                self.selected_worker, old_position, position, self)
 
                         if proceed_to_build:
                             if GameManager.current_game.check_if_winning_tile(position):
@@ -147,16 +154,17 @@ class GameScene(Scene):
                             self.show_build_popup()
                             self.highlight_selected_worker()
 
-                            #if moved worker cant build -> player loses
+                            # if moved worker cant build -> player loses
                             if not GameManager.current_game.can_worker_build(self.selected_worker):
                                 print("GAME OVER")
-                                #show a pop up
+                                # show a pop up
                                 lost_player_id = GameManager.current_game.get_current_player().id
                                 GameManager.get_game().end_turn()
                                 self.show_loss_popup(
-                                    player_id= lost_player_id,
+                                    player_id=lost_player_id,
                                     reason="Selected worker cannot build.",
-                                    on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER)
+                                    on_confirm=lambda: SceneManager.change_scene(
+                                        SceneID.GAME_OVER)
                                 )
 
                             self.current_phase = Phase.BUILD_STACK
@@ -174,14 +182,18 @@ class GameScene(Scene):
 
                 if self.selected_worker:
                     if GameManager.current_game.validate_build_position(self.selected_worker, position):
-                        GameManager.current_game.add_stack(position)  # Update logic
-                        logic_tile = GameManager.current_game.get_tile(position)
-                        self.change_stack_visuals(position, logic_tile.stack_height)  # Update visuals
+                        GameManager.current_game.add_stack(
+                            position)  # Update logic
+                        logic_tile = GameManager.current_game.get_tile(
+                            position)
+                        self.change_stack_visuals(
+                            position, logic_tile.stack_height)  # Update visuals
 
                         god = GameManager.get_game().get_current_player().god
                         next_turn = True
                         if god:
-                            next_turn = god.on_stack_built(self.selected_worker, position, self)
+                            next_turn = god.on_stack_built(
+                                self.selected_worker, position, self)
 
                         if next_turn:
                             if GameManager.current_game.check_if_winning_tile(position):
@@ -197,7 +209,7 @@ class GameScene(Scene):
                             GameManager.get_game().end_turn()
                             self.highlight_current_players_workers()
 
-                            #if next player cant move any worker -> player loses
+                            # if next player cant move any worker -> player loses
                             if not GameManager.current_game.can_player_move(GameManager.current_game.get_current_player()):
                                 print("GAME OVER")
                                 lost_player_id = GameManager.current_game.get_current_player().id
@@ -205,9 +217,10 @@ class GameScene(Scene):
                                 self.show_loss_popup(
                                     player_id=lost_player_id,
                                     reason="No available moves for any worker.",
-                                    on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER) #will change for a multiplayer game
+                                    on_confirm=lambda: SceneManager.change_scene(
+                                        SceneID.GAME_OVER)  # will change for a multiplayer game
                                 )
-                            
+
                     else:
                         self.show_invalid_build_popup()
 
@@ -219,9 +232,18 @@ class GameScene(Scene):
         assert self._grid
         return self._grid[position.x][position.y]
 
-    def change_stack_visuals(self, tile_position: Vector2I, stack_count: int):
-        assert stack_count <= SettingManager.max_stacks_before_dome+1
+    def change_stack_visuals(self, tile_position: Vector2I, stack_count: Optional[int] = None):
+        """
+        Updates/refreshes the visuals on the provided tiles, with an option provided to change the stack count of said tile in the process
+        """
+        # ? Get tile sprite parent and tile data (safely)
         tile = self.get_tile(tile_position)
+        assert GameManager.current_game
+        tile_data = GameManager.current_game.get_tile(tile_position)
+        # * If stack count provided
+        if not stack_count:
+            stack_count = tile_data.stack_height
+        assert stack_count <= SettingManager.max_stacks_before_dome+1
 
         for i in range(SettingManager.max_stacks_before_dome):
             if i <= stack_count-1:
@@ -244,6 +266,13 @@ class GameScene(Scene):
             worker_centre_x - WORKER_WIDTH_PX,
             worker_centre_y - WORKER_HEIGHT_PX)  # ! may need to scale with ui scaling
 
+        if tile_data.worker:
+            tile.canvas.itemconfig(
+                tile.worker_sprite, fill=PLAYER_COLORS[tile_data.worker.player_id], state=NORMAL)
+        else:
+            tile.canvas.itemconfig(
+                tile.worker_sprite, state=HIDDEN)
+
     def start_game(self, grid_size: Vector2I):
         assert grid_size.x > 0
         assert grid_size.y > 0
@@ -265,29 +294,16 @@ class GameScene(Scene):
 
         # --- Get all the workers ---
         workers = []
+        assert GameManager.current_game
         for player in GameManager.current_game.players:
             workers.extend(player.workers)
 
         # --- Place each worker on a tile ---
         for worker, tile in zip(workers, all_tiles):
-            tile.canvas.itemconfig(tile.worker_sprite, state=NORMAL)
             logic_tile = GameManager.current_game.get_tile(tile.position)
             logic_tile.worker = worker  # link the logic tile to the worker
             worker.position = tile.position  # update worker's position
-
-    def move_worker_visual(self, worker: Worker, old_position: Vector2I, new_position: Vector2I):
-        old_tile = self.get_tile(old_position)
-        new_tile = self.get_tile(new_position)
-
-        # Hide old tile sprite unconditionally
-        old_tile.canvas.itemconfig(old_tile.worker_sprite, state=HIDDEN)
-
-        # Show new tile sprite if logic says there's a worker
-        logic_tile = GameManager.current_game.get_tile(new_position)
-        if logic_tile.worker:
-            new_tile.canvas.itemconfig(new_tile.worker_sprite, state=NORMAL)
-        else:
-            new_tile.canvas.itemconfig(new_tile.worker_sprite, state=HIDDEN)
+            self.change_stack_visuals(worker.position)
 
     def cleanup(self):
         # TODO reset everything
@@ -303,7 +319,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Player {current_player.id}'s Turn!",
             font=("Helvetica", 18, "bold"),
-            bg= POP_UP_COLOR,  # light yellow
+            bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -366,7 +382,7 @@ class GameScene(Scene):
             tile.canvas.itemconfig(
                 tile.worker_sprite,
                 outline="gold",
-                width=5           
+                width=5
             )
 
     def highlight_selected_worker(self):
@@ -391,7 +407,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Worker Selected! Move your worker...",
             font=("Helvetica", 18, "bold"),
-            bg= POP_UP_COLOR,  # light yellow
+            bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -408,7 +424,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Worker Moved! Click on an adjacent tile to build...",
             font=("Helvetica", 18, "bold"),
-            bg= POP_UP_COLOR,  # light yellow
+            bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -425,7 +441,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Worker cannot be moved here! Please try Again.",
             font=("Helvetica", 18, "bold"),
-            bg= POP_UP_COLOR,  # light yellow
+            bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -442,7 +458,7 @@ class GameScene(Scene):
             self.frame,
             text=f"Cannot build here! Please try Again.",
             font=("Helvetica", 18, "bold"),
-            bg= POP_UP_COLOR,  # light yellow
+            bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
             bd=2,
@@ -453,7 +469,7 @@ class GameScene(Scene):
 
         # Auto-destroy popup after 1 second
         self.frame.after(1000, popup.destroy)
-    
+
     def update_phase_info(self):
         current_player = GameManager.get_game().get_current_player()
         text = f"Player {current_player.id}'s Turn\n\n"
@@ -509,8 +525,7 @@ class GameScene(Scene):
 
     def _handle_popup_close(self, popup: Toplevel, on_confirm: Callable[[], None]):
         popup.destroy()
-        on_confirm() #could be used to continue game with remaining players or show winner
-
+        on_confirm()  # could be used to continue game with remaining players or show winner
 
     def show_god_info(self):
         current_player = GameManager.get_game().get_current_player()

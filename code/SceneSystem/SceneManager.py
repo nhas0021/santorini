@@ -12,7 +12,7 @@ class SceneManager:
         - Hiding the various objects (scope-wise) within the scene (buttons and labels) from other scenes
     - Standardised & Clean Transitions
         - Allows for multiple people to work on different parts of the game without interference
-        - Clean way to cchange scenes
+        - Clean way to change scenes
 
     """
     current_scene: Optional[Scene] = None

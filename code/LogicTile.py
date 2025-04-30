@@ -5,5 +5,5 @@ from Worker import Worker
 class LogicTile:
     def __init__(self, position: Vector2I):
         self.position = position
-        self.stack_height = 0
+        self.stack_height:int = 0
         self.worker:Optional[Worker] = None
