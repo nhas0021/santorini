@@ -1,5 +1,5 @@
 import random
-from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame, Label
+from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame, Label, Toplevel, Button
 from typing import Callable, List, Optional, Tuple
 from MathLib.Vector import Vector2I
 from SettingManager import SettingManager
@@ -82,8 +82,9 @@ class GameScene(Scene):
 
         match self.current_phase:
             case Phase.SELECT_WORKER:
+                current_player = GameManager.get_game().get_current_player()
+                
                 if logic_tile.worker:
-                    current_player = GameManager.get_game().get_current_player()
                     #Check if the worker the player is trying to select is the current player's worker
                     if logic_tile.worker.player_id == current_player.id:  
                         print(
@@ -121,6 +122,19 @@ class GameScene(Scene):
                         
                         self.show_build_popup()
                         self.highlight_selected_worker()
+
+                        #if moved worker cant build -> player loses
+                        if not GameManager.current_game.can_worker_build(self.selected_worker):
+                            print("GAME OVER")
+                            #show a pop up
+                            lost_player_id = GameManager.current_game.get_current_player().id
+                            GameManager.get_game().end_turn()
+                            self.show_loss_popup(
+                                player_id= lost_player_id,
+                                reason="Selected worker cannot build.",
+                                on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER)
+                            )
+
                         self.current_phase = Phase.BUILD_STACK
                         self.update_phase_info()   
 
@@ -139,9 +153,22 @@ class GameScene(Scene):
                         self.change_stack_visuals(
                             position, logic_tile.stack_height)  # Update visuals
 
-                        GameManager.get_game().end_turn()
+                        GameManager.get_game().end_turn() #
                         self.current_phase = Phase.SELECT_WORKER
                         self.selected_worker = None
+
+                        #if next player cant move any worker -> player loses
+                        if not GameManager.current_game.can_player_move(GameManager.current_game.get_current_player()):
+                            print("GAME OVER")
+                            lost_player_id = GameManager.current_game.get_current_player().id
+                            GameManager.get_game().end_turn()
+                            self.show_loss_popup(
+                                player_id=lost_player_id,
+                                reason="No available moves for any worker.",
+                                on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER) #will change for a multiplayer game
+                            )
+
+                        #put in another function on_turn_change()
                         self.update_phase_info()
                         self.show_player_turn_popup()
                         self.highlight_current_players_workers()
@@ -389,6 +416,48 @@ class GameScene(Scene):
                 text += "Waiting..."
 
         self.phase_info_label.config(text=text)
+
+    def show_loss_popup(self, player_id: int, reason: str, on_confirm: Callable[[], None]):
+        popup = Toplevel(self.frame)
+        popup.title("Player Eliminated")
+        popup.geometry("450x250")
+        popup.configure(bg="white")
+        popup.grab_set()  # Prevent interaction with main window
+
+        # Header
+        title = Label(
+            popup,
+            text=f"Player {player_id} has been eliminated!",
+            font=("Helvetica", 18, "bold"),
+            fg="#FF0000",
+            bg="white"
+        )
+        title.pack(pady=(20, 10))
+
+        # Reason
+        message = Label(
+            popup,
+            text=f"Reason: {reason}",
+            font=("Helvetica", 14),
+            bg="white",
+            wraplength=400,
+            justify="center"
+        )
+        message.pack(pady=10)
+
+        # Continue Button
+        continue_btn = Button(
+            popup,
+            text="Continue",
+            font=("Helvetica", 12),
+            command=lambda: self._handle_popup_close(popup, on_confirm)
+        )
+        continue_btn.pack(pady=20)
+
+    def _handle_popup_close(self, popup: Toplevel, on_confirm: Callable[[], None]):
+        popup.destroy()
+        on_confirm() #could be used to continue game with remaining players or show winner
+
 
 
 

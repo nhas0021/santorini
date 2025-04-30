@@ -13,5 +13,4 @@ class TurnManager:
 
     def end_turn(self) -> None:
         self.current_player_index = (self.current_player_index + 1) % len(self.players)
-        self.selected_worker = None
 

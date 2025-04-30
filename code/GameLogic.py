@@ -108,3 +108,18 @@ class Game:
     
     def end_turn(self) -> None:
         self.turn_manager.end_turn()
+
+    def can_worker_move(self, worker: Worker) -> bool:
+        for pos in worker.position.get_adjacent_positions(self.size):
+            if self.validate_move_position(worker, pos):
+                return True
+        return False
+
+    def can_worker_build(self, worker: Worker) -> bool:
+        for pos in worker.position.get_adjacent_positions(self.size):
+            if self.validate_build_position(worker, pos):
+                return True
+        return False
+
+    def can_player_move(self, player: Player) -> bool:
+        return any(self.can_worker_move(w) for w in player.workers)
