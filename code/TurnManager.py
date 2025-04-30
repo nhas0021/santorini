@@ -12,6 +12,14 @@ class TurnManager:
         return self.players[self.current_player_index]
 
     def end_turn(self) -> None:
+        current_player = self.get_current_player()
+        if hasattr(current_player, "god") and current_player.god is not None:
+            god = current_player.god
+            if hasattr(god, "first_move_done"):
+                god.first_move_done = False
+            if hasattr(god, "initial_position"):
+                god.initial_position = None
+
         self.current_player_index = (self.current_player_index + 1) % len(self.players)
         self.selected_worker = None
 

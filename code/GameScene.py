@@ -47,7 +47,7 @@ class GameScene(Scene):
 
         #show the current game phase
         self.info_panel = Frame(self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
-        self.info_panel.place(relx=0.05, rely=0.5, anchor="w")
+        self.info_panel.place(relx=0.05, rely=0.3, anchor="w")
 
         # Label inside the info panel
         self.phase_info_label = Label(
@@ -61,11 +61,27 @@ class GameScene(Scene):
         )
         self.phase_info_label.place(relx=0.5, rely=0.5, anchor="center")
 
+        # Label for God info
+        self.god_panel = Frame(self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
+        self.god_panel.place(relx=0.05, rely=0.7, anchor="w")
+
+        self.god_info_label = Label(
+            self.god_panel,
+            text="",
+            font=("Helvetica", 12, "bold"),
+            bg=POP_UP_COLOR,
+            fg="#333",
+            wraplength=180,
+            justify="center"
+        )
+        self.god_info_label.place(relx=0.5, rely=0.5, anchor="center")
+
     def on_enter_scene(self):
         self.start_game(SettingManager.grid_size)
         self.show_player_turn_popup()
         self.highlight_current_players_workers()
         self.update_phase_info()
+        self.show_god_info()
 
     def on_exit_scene(self):
         self.cleanup()
@@ -93,6 +109,7 @@ class GameScene(Scene):
                         self.highlight_selected_worker()
                         self.current_phase = Phase.MOVE_WORKER
                         self.update_phase_info()
+                        self.show_god_info()
                     else:
                         self.show_cannot_select_worker_popup()
                         print(f"[DEBUG] Cannot select other player's worker.")
@@ -107,22 +124,25 @@ class GameScene(Scene):
                     logic_tile = GameManager.current_game.get_tile(position)
 
                     if GameManager.current_game.validate_move_position(self.selected_worker, position):
-                        print(
-                            f"[DEBUG] Moving worker to {position.x}-{position.y}")
-                        GameManager.current_game.move_worker(
-                            self.selected_worker, position)
-                        self.move_worker_visual(
-                            self.selected_worker, old_position, position)
-                            
-                        # ! Note: "You win immediately if one of your workers moves from a lover level up to a level 3 tower"
-                        if GameManager.current_game.check_if_winning_tile(position):
-                            print("GAME WON")  # TODO what happens after win
-                            SceneManager.change_scene(SceneID.GAME_OVER)
-                        
-                        self.show_build_popup()
-                        self.highlight_selected_worker()
-                        self.current_phase = Phase.BUILD_STACK
-                        self.update_phase_info()   
+                        print(f"[DEBUG] Moving worker to {position.x}-{position.y}")
+                        GameManager.current_game.move_worker(self.selected_worker, position)
+                        self.move_worker_visual(self.selected_worker, old_position, position)
+
+                        god = GameManager.get_game().get_current_player().god
+                        proceed_to_build = True
+                        if god:
+                            proceed_to_build = god.on_worker_moved(self.selected_worker, old_position, position, self)
+
+                        if proceed_to_build:
+                            if GameManager.current_game.check_if_winning_tile(position):
+                                print("GAME WON")
+                                SceneManager.change_scene(SceneID.GAME_OVER)
+
+                            self.show_build_popup()
+                            self.highlight_selected_worker()
+                            self.current_phase = Phase.BUILD_STACK
+                            self.update_phase_info()
+                            self.show_god_info()
 
                     else:
                         self.show_invalid_movement_popup()
@@ -132,19 +152,29 @@ class GameScene(Scene):
 
                 if self.selected_worker:
                     if GameManager.current_game.validate_build_position(self.selected_worker, position):
-                        GameManager.current_game.add_stack(
-                            position)  # Update logic
-                        logic_tile = GameManager.current_game.get_tile(
-                            position)
-                        self.change_stack_visuals(
-                            position, logic_tile.stack_height)  # Update visuals
+                        GameManager.current_game.add_stack(position)  # Update logic
+                        logic_tile = GameManager.current_game.get_tile(position)
+                        self.change_stack_visuals(position, logic_tile.stack_height)  # Update visuals
 
-                        GameManager.get_game().end_turn()
-                        self.current_phase = Phase.SELECT_WORKER
-                        self.selected_worker = None
-                        self.update_phase_info()
-                        self.show_player_turn_popup()
-                        self.highlight_current_players_workers()
+                        god = GameManager.get_game().get_current_player().god
+                        next_turn = True
+                        if god:
+                            next_turn = god.on_stack_built(self.selected_worker, position, self)
+
+                        if next_turn:
+                            if GameManager.current_game.check_if_winning_tile(position):
+                                print("GAME WON")
+                                SceneManager.change_scene(SceneID.GAME_OVER)
+
+                            self.show_build_popup()
+                            self.highlight_selected_worker()
+                            self.current_phase = Phase.SELECT_WORKER
+                            self.selected_worker = None
+                            self.update_phase_info()
+                            self.show_god_info()
+                            GameManager.get_game().end_turn()
+                            self.highlight_current_players_workers()
+                            
                     else:
                         self.show_invalid_build_popup()
 
@@ -390,8 +420,8 @@ class GameScene(Scene):
 
         self.phase_info_label.config(text=text)
 
+    def show_god_info(self):
+        current_player = GameManager.get_game().get_current_player()
+        text = f"God: {current_player.god.name}\n\n{current_player.god.description}"
 
-
-
-
-
+        self.god_info_label.config(text=text)
