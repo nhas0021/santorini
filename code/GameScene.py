@@ -87,13 +87,18 @@ class GameScene(Scene):
                 if logic_tile.worker:
                     #Check if the worker the player is trying to select is the current player's worker
                     if logic_tile.worker.player_id == current_player.id:  
-                        print(
-                            f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
-                        self.selected_worker = logic_tile.worker
-                        self.show_worker_selected_popup()
-                        self.highlight_selected_worker()
-                        self.current_phase = Phase.MOVE_WORKER
-                        self.update_phase_info()
+                        
+                        #Check if the worker the player is trying to select can move
+                        if not GameManager.get_game().can_worker_move(logic_tile.worker):
+                            print(f"[DEBUG] This worker cannot move!")
+                            self.show_worker_cannot_move_popup()
+                        else:
+                            print(f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
+                            self.selected_worker = logic_tile.worker
+                            self.show_worker_selected_popup()
+                            self.highlight_selected_worker()
+                            self.current_phase = Phase.MOVE_WORKER
+                            self.update_phase_info()
                     else:
                         self.show_cannot_select_worker_popup()
                         print(f"[DEBUG] Cannot select other player's worker.")
@@ -283,6 +288,23 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Cannot select another player's worker!",
+            font=("Helvetica", 18, "bold"),
+            bg=POP_UP_COLOR,  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 1.5 seconds
+        self.frame.after(1500, popup.destroy)
+
+    def show_worker_cannot_move_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"This worker cannot move! Please select another worker",
             font=("Helvetica", 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
