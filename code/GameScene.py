@@ -147,21 +147,24 @@ class GameScene(Scene):
                             self.show_build_popup()
                             self.highlight_selected_worker()
 
-                        #if moved worker cant build -> player loses
-                        if not GameManager.current_game.can_worker_build(self.selected_worker):
-                            print("GAME OVER")
-                            #show a pop up
-                            lost_player_id = GameManager.current_game.get_current_player().id
-                            GameManager.get_game().end_turn()
-                            self.show_loss_popup(
-                                player_id= lost_player_id,
-                                reason="Selected worker cannot build.",
-                                on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER)
-                            )
+                            #if moved worker cant build -> player loses
+                            if not GameManager.current_game.can_worker_build(self.selected_worker):
+                                print("GAME OVER")
+                                #show a pop up
+                                lost_player_id = GameManager.current_game.get_current_player().id
+                                GameManager.get_game().end_turn()
+                                self.show_loss_popup(
+                                    player_id= lost_player_id,
+                                    reason="Selected worker cannot build.",
+                                    on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER)
+                                )
 
                             self.current_phase = Phase.BUILD_STACK
                             self.update_phase_info()
                             self.show_god_info()
+                        else:
+                            self.highlight_selected_worker()
+                            self.show_worker_selected_popup()
 
                     else:
                         self.show_invalid_movement_popup()
@@ -386,7 +389,7 @@ class GameScene(Scene):
     def show_worker_selected_popup(self):
         popup = Label(
             self.frame,
-            text=f"Worker Selected!",
+            text=f"Worker Selected! Move your worker...",
             font=("Helvetica", 18, "bold"),
             bg= POP_UP_COLOR,  # light yellow
             fg="#333",
