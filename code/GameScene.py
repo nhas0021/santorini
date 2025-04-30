@@ -328,8 +328,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1.5 second
-        self.frame.after(1500, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_cannot_select_worker_popup(self):
         popup = Label(
@@ -345,8 +345,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1.5 seconds
-        self.frame.after(1500, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_worker_cannot_move_popup(self):
         popup = Label(
@@ -362,8 +362,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1.5 seconds
-        self.frame.after(1500, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def highlight_current_players_workers(self):
         assert self._grid
@@ -416,8 +416,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1.5 seconds
-        self.frame.after(1500, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_build_popup(self):
         popup = Label(
@@ -433,8 +433,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1.5 seconds
-        self.frame.after(1500, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_invalid_movement_popup(self):
         popup = Label(
@@ -450,8 +450,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1 second
-        self.frame.after(1000, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_invalid_build_popup(self):
         popup = Label(
@@ -467,8 +467,8 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after 1 second
-        self.frame.after(1000, popup.destroy)
+        # Auto-destroy popup after delay
+        self.frame.after(POPUP_DURATION, popup.destroy)
 
     def update_phase_info(self):
         current_player = GameManager.get_game().get_current_player()

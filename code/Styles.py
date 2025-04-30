@@ -5,6 +5,10 @@ from tkinter import Frame
 from typing import Callable
 from MathLib.Vector import Vector2I
 
+#region Timing
+POPUP_DURATION = 5000
+#endregion
+
 # region Colours
 WHITE: str = "#FFFFFF"
 BLACK: str = "#000000"
