@@ -21,7 +21,7 @@ class Title (Scene):
         self.start_bg_button.pack(fill="both", expand=True)
 
         self._start_text = tk.Label(
-            self.frame, bg=BG_COLOUR, text="Click anywhere to start...", fg=TEXT_COLOUR, justify="center")
+            self.frame, bg=BG_COLOUR, text="Click anywhere to start...", fg=WHITE, justify="center")
         self._start_text.place(relx=0.5, rely=0.5, anchor="center")
 
 
@@ -37,81 +37,24 @@ class MainMenu(Scene):
             text="Santorini",
             bg=WHITE,
             fg=BLACK,
-            font=("Georgia", 45, "bold underline"),
+            font=(FONT_TITLE, 45, "bold underline"),
             justify="center"
         )
         self.text_title.place(relx=0.5, rely=0.1, anchor="center")
 
-        self.button_play = tk.Button(
-            self.frame, text="Play", font=("Comic Sans MS", 20),
-            bg="#90EE90",        # light green
-            fg="darkgreen",      # text color
-            activebackground="#77DD77",  # hover background color
-            activeforeground="white",    # hover text color
-            borderwidth=4,
-            highlightbackground="darkgreen",  # border color (macOS/Linux)
-            highlightcolor="darkgreen",       # border color focus
-            highlightthickness=2,
-            relief="solid",       # makes the border visible
-            width=10,
-            command=lambda: SceneManager.change_scene(SceneID.PRE_GAME))
+        self.button_play = generate_main_menu_button_positive(self.frame, "Play", lambda: SceneManager.change_scene(SceneID.PRE_GAME))
         self.button_play.place(relx=0.2, rely=0.25, anchor="w")
 
-        self.button_tutorial = tk.Button(
-            self.frame, text="Tutorial", font=("Comic Sans MS", 20),
-            bg="#90EE90",        # light green
-            fg="darkgreen",      # text color
-            activebackground="#77DD77",  # hover background color
-            activeforeground="white",    # hover text color
-            borderwidth=4,
-            highlightbackground="darkgreen",  # border color (macOS/Linux)
-            highlightcolor="darkgreen",       # border color focus
-            highlightthickness=2,
-            relief="solid",       # makes the border visible
-            width=10,
-            command=lambda: SceneManager.change_scene(SceneID.TUTORIAL))
+        self.button_tutorial = generate_main_menu_button_positive(self.frame, "Tutorial", lambda: SceneManager.change_scene(SceneID.TUTORIAL))
         self.button_tutorial.place(relx=0.2, rely=0.4, anchor="w")
 
-        self.button_rulebook = tk.Button(
-            self.frame, text="Rule Book", font=("Comic Sans MS", 20),
-            bg="#90EE90",        # light green
-            fg="darkgreen",      # text color
-            activebackground="#77DD77",  # hover background color
-            activeforeground="white",    # hover text color
-            borderwidth=4,
-            highlightbackground="darkgreen",  # border color (macOS/Linux)
-            highlightcolor="darkgreen",       # border color focus
-            highlightthickness=2,
-            relief="solid",       # makes the border visible
-            width=10,
-            command=lambda: SceneManager.change_scene(SceneID.RULEBOOK))
+        self.button_rulebook = generate_main_menu_button_positive(self.frame, "Rule Book", lambda: SceneManager.change_scene(SceneID.RULEBOOK))
         self.button_rulebook.place(relx=0.2, rely=0.55, anchor="w")
 
-        self.button_settings = tk.Button(
-            self.frame, text="Settings", font=("Comic Sans MS", 20),
-            bg="#90EE90",        # light green
-            fg="darkgreen",      # text color
-            activebackground="#77DD77",  # hover background color
-            activeforeground="white",    # hover text color
-            borderwidth=4,
-            highlightbackground="darkgreen",  # border color (macOS/Linux)
-            highlightcolor="darkgreen",       # border color focus
-            highlightthickness=2,
-            relief="solid",       # makes the border visible
-            width=10,
-            command=lambda: SceneManager.change_scene(SceneID.SETTINGS))
+        self.button_settings = generate_main_menu_button_positive(self.frame, "Settings", lambda: SceneManager.change_scene(SceneID.SETTINGS))
         self.button_settings.place(relx=0.2, rely=0.7, anchor="w")
 
-        self.button_quit = tk.Button(
-            self.frame, text="Quit", font=("Comic Sans MS", 20),
-            bg="#FF7F7F",        # light green
-            fg=BLACK,      # text color
-            activebackground="#77DD77",  # hover background color
-            activeforeground="white",    # hover text color
-            borderwidth=4,
-            relief="solid",       # makes the border visible
-            width=10,
-            command=root.destroy)  # Properly shuts down the application
+        self.button_quit = generate_main_menu_button_negative(self.frame, "Quit", root.destroy)
         self.button_quit.place(relx=0.2, rely=0.85, anchor="w")
 
         # image
@@ -132,7 +75,7 @@ class PreGame(Scene):
         self.title_label = tk.Label(
             self.frame,
             text="Santorini - Game Setup",
-            font=("Georgia", 32, "bold"),
+            font=(FONT_TITLE, 32, "bold"),
             bg="#ffffff",
             fg="#2E2E2E"
         )
@@ -142,7 +85,7 @@ class PreGame(Scene):
         self.info_text = tk.Label(
             self.frame,
             text=f"Number of Players: {SettingManager.player_count}\nGrid Size: {SettingManager.grid_size.x} x {SettingManager.grid_size.y}",
-            font=("Helvetica", 16),
+            font=(FONT_GENERAL, 16),
             bg="#ffffff",
             fg="#333333",
             justify="center"
@@ -153,7 +96,7 @@ class PreGame(Scene):
         self.instructions_label = tk.Label(
             self.frame,
             text="Click below to assign gods and start the game.",
-            font=("Helvetica", 14),
+            font=(FONT_GENERAL, 14),
             bg="#ffffff"
         )
         self.instructions_label.pack(pady=10)
@@ -162,7 +105,7 @@ class PreGame(Scene):
         self.start_button = tk.Button(
             self.frame,
             text="Attain God Powers",
-            font=("Helvetica", 16, "bold"),
+            font=(FONT_GENERAL, 16, "bold"),
             bg="#4CAF50",
             fg="white",
             padx=20,
@@ -175,7 +118,7 @@ class PreGame(Scene):
         self.back_button = tk.Button(
             self.frame,
             text="Back to Main Menu",
-            font=("Helvetica", 16),
+            font=(FONT_GENERAL, 16),
             bg="#FF7F7F",
             fg="white",
             padx=20,
@@ -199,7 +142,7 @@ class GodAssignment(Scene):
         self.title_label = tk.Label(
             self.frame,
             text="God Assignment",
-            font=("Georgia", 28, "bold"),
+            font=(FONT_TITLE, 28, "bold"),
             bg="#ffffff",
             fg="#2E2E2E"
         )
@@ -208,7 +151,7 @@ class GodAssignment(Scene):
         self.info_label = tk.Label(
             self.frame,
             text="Gods are being assigned randomly to players...",
-            font=("Helvetica", 14),
+            font=(FONT_GENERAL, 14),
             bg="#ffffff"
         )
         self.info_label.pack(pady=10)
@@ -216,7 +159,7 @@ class GodAssignment(Scene):
         self.assign_button = tk.Button(
             self.frame,
             text="Assign Gods",
-            font=("Helvetica", 16, "bold"),
+            font=(FONT_GENERAL, 16, "bold"),
             bg="#4CAF50",
             fg="white",
             padx=20,
@@ -231,7 +174,7 @@ class GodAssignment(Scene):
         self.start_game_button = tk.Button(
             self.frame,
             text="Start Game",
-            font=("Helvetica", 16, "bold"),
+            font=(FONT_GENERAL, 16, "bold"),
             bg="#1E88E5",
             fg="white",
             padx=20,
@@ -245,7 +188,7 @@ class GodAssignment(Scene):
         self.back_button = tk.Button(
             self.frame,
             text="Back to Pre-Game",
-            font=("Helvetica", 16),
+            font=(FONT_GENERAL, 16),
             bg="#FF7F7F",
             fg="white",
             padx=20,
@@ -267,7 +210,7 @@ class GodAssignment(Scene):
             player_label = tk.Label(
                 self.result_frame,
                 text=f"Player {player.id} ➝ {player.god.name}",
-                font=("Helvetica", 14),
+                font=(FONT_GENERAL, 14),
                 bg="#ffffff",
                 fg="#333333"
             )
@@ -289,7 +232,7 @@ class RuleBook(Scene):
         self.title_label = tk.Label(
             self.frame,
             text="Rule Book",
-            font=("Georgia", 28, "bold"),
+            font=(FONT_TITLE, 28, "bold"),
             bg="#ffffff",
             fg="#2E2E2E"
         )
@@ -299,7 +242,7 @@ class RuleBook(Scene):
         self.rules_text = tk.Text(
             self.frame,
             wrap="word",
-            font=("Helvetica", 14),
+            font=(FONT_GENERAL, 14),
             bg="#ffffff",
             fg="#333333",
             height=20,
@@ -322,7 +265,7 @@ class RuleBook(Scene):
         self.back_button = tk.Button(
             self.frame,
             text="Back to Main Menu",
-            font=("Helvetica", 16),
+            font=(FONT_GENERAL, 16),
             bg="#FF7F7F",
             fg="white",
             padx=20,
@@ -340,7 +283,7 @@ class GameOver(Scene):
         self.title_label = tk.Label(
             self.frame,
             text="Game Over",
-            font=("Georgia", 36, "bold"),
+            font=(FONT_TITLE, 36, "bold"),
             bg="#ffffff",
             fg="#FF0000"
         )
@@ -350,7 +293,7 @@ class GameOver(Scene):
         self.winner_label = tk.Label(
             self.frame,
             text="",  # Will be set later
-            font=("Helvetica", 24, "bold"),
+            font=(FONT_GENERAL, 24, "bold"),
             bg="#ffffff",
             fg="#2E8B57"
         )
@@ -360,7 +303,7 @@ class GameOver(Scene):
         self.main_menu_button = tk.Button(
             self.frame,
             text="Return to Main Menu",
-            font=("Helvetica", 16),
+            font=(FONT_GENERAL, 16),
             bg="#ADD8E6",
             fg="black",
             padx=20,

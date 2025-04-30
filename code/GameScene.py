@@ -54,7 +54,7 @@ class GameScene(Scene):
         self.phase_info_label = Label(
             self.info_panel,
             text="",
-            font=("Helvetica", 12, "bold"),
+            font=(FONT_GENERAL, 12, "bold"),
             bg=POP_UP_COLOR,
             fg="#333",
             wraplength=180,
@@ -70,7 +70,7 @@ class GameScene(Scene):
         self.god_info_label = Label(
             self.god_panel,
             text="",
-            font=("Helvetica", 12, "bold"),
+            font=(FONT_GENERAL, 12, "bold"),
             bg=POP_UP_COLOR,
             fg="#333",
             wraplength=180,
@@ -318,7 +318,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Player {current_player.id}'s Turn!",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -335,7 +335,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Cannot select another player's worker!",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -352,7 +352,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"This worker cannot move! Please select another worker",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -406,7 +406,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Worker Selected! Move your worker...",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -423,7 +423,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Worker Moved! Click on an adjacent tile to build...",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -440,7 +440,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Worker cannot be moved here! Please try Again.",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -457,7 +457,7 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Cannot build here! Please try Again.",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
             relief="solid",
@@ -497,7 +497,7 @@ class GameScene(Scene):
         title = Label(
             popup,
             text=f"Player {player_id} has been eliminated!",
-            font=("Helvetica", 18, "bold"),
+            font=(FONT_GENERAL, 18, "bold"),
             fg="#FF0000",
             bg="white"
         )
@@ -507,7 +507,7 @@ class GameScene(Scene):
         message = Label(
             popup,
             text=f"Reason: {reason}",
-            font=("Helvetica", 14),
+            font=(FONT_GENERAL, 14),
             bg="white",
             wraplength=400,
             justify="center"
@@ -518,7 +518,7 @@ class GameScene(Scene):
         continue_btn = Button(
             popup,
             text="Continue",
-            font=("Helvetica", 12),
+            font=(FONT_GENERAL, 12),
             command=lambda: self._handle_popup_close(popup, on_confirm)
         )
         continue_btn.pack(pady=20)
