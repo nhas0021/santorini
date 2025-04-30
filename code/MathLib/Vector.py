@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from math import sqrt
+from typing import Optional
 
 
 @dataclass
@@ -96,6 +97,23 @@ class Vector2I:
         dx = abs(v.x - self.x)
         dy = abs(v.y - self.y)
         return max(dx, dy) <= 1
+    
+    def get_adjacent_positions(self, bounds: Optional["Vector2I"] = None) -> list["Vector2I"]:
+        deltas = [(-1, -1), (-1, 0), (-1, 1),
+                (0, -1),           (0, 1),
+                (1, -1),  (1, 0),  (1, 1)]
+        
+        adjacent = [
+            Vector2I(self.x + dx, self.y + dy)
+            for dx, dy in deltas
+        ]
+
+        if bounds:
+            # Clip to grid bounds
+            adjacent = [pos for pos in adjacent if 0 <= pos.x < bounds.x and 0 <= pos.y < bounds.y]
+
+        return adjacent
+
     
     # ? Most likely won't need
     # # ! v2 = v1 * f

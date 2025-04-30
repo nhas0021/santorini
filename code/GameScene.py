@@ -1,5 +1,5 @@
 import random
-from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame, Label
+from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame, Label, Toplevel, Button
 from typing import Callable, List, Optional, Tuple
 from MathLib.Vector import Vector2I
 from SettingManager import SettingManager
@@ -98,18 +98,24 @@ class GameScene(Scene):
 
         match self.current_phase:
             case Phase.SELECT_WORKER:
+                current_player = GameManager.get_game().get_current_player()
+                
                 if logic_tile.worker:
-                    current_player = GameManager.get_game().get_current_player()
                     #Check if the worker the player is trying to select is the current player's worker
                     if logic_tile.worker.player_id == current_player.id:  
-                        print(
-                            f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
-                        self.selected_worker = logic_tile.worker
-                        self.show_worker_selected_popup()
-                        self.highlight_selected_worker()
-                        self.current_phase = Phase.MOVE_WORKER
-                        self.update_phase_info()
-                        self.show_god_info()
+                        
+                        #Check if the worker the player is trying to select can move
+                        if not GameManager.get_game().can_worker_move(logic_tile.worker):
+                            print(f"[DEBUG] This worker cannot move!")
+                            self.show_worker_cannot_move_popup()
+                        else:
+                            print(f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
+                            self.selected_worker = logic_tile.worker
+                            self.show_worker_selected_popup()
+                            self.highlight_selected_worker()
+                            self.current_phase = Phase.MOVE_WORKER
+                            self.update_phase_info()
+                            self.show_god_info()
                     else:
                         self.show_cannot_select_worker_popup()
                         print(f"[DEBUG] Cannot select other player's worker.")
@@ -140,6 +146,19 @@ class GameScene(Scene):
 
                             self.show_build_popup()
                             self.highlight_selected_worker()
+
+                        #if moved worker cant build -> player loses
+                        if not GameManager.current_game.can_worker_build(self.selected_worker):
+                            print("GAME OVER")
+                            #show a pop up
+                            lost_player_id = GameManager.current_game.get_current_player().id
+                            GameManager.get_game().end_turn()
+                            self.show_loss_popup(
+                                player_id= lost_player_id,
+                                reason="Selected worker cannot build.",
+                                on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER)
+                            )
+
                             self.current_phase = Phase.BUILD_STACK
                             self.update_phase_info()
                             self.show_god_info()
@@ -174,6 +193,17 @@ class GameScene(Scene):
                             self.show_god_info()
                             GameManager.get_game().end_turn()
                             self.highlight_current_players_workers()
+
+                            #if next player cant move any worker -> player loses
+                            if not GameManager.current_game.can_player_move(GameManager.current_game.get_current_player()):
+                                print("GAME OVER")
+                                lost_player_id = GameManager.current_game.get_current_player().id
+                                GameManager.get_game().end_turn()
+                                self.show_loss_popup(
+                                    player_id=lost_player_id,
+                                    reason="No available moves for any worker.",
+                                    on_confirm=lambda: SceneManager.change_scene(SceneID.GAME_OVER) #will change for a multiplayer game
+                                )
                             
                     else:
                         self.show_invalid_build_popup()
@@ -286,6 +316,23 @@ class GameScene(Scene):
         popup = Label(
             self.frame,
             text=f"Cannot select another player's worker!",
+            font=("Helvetica", 18, "bold"),
+            bg=POP_UP_COLOR,  # light yellow
+            fg="#333",
+            relief="solid",
+            bd=2,
+            padx=10,
+            pady=5
+        )
+        popup.place(relx=0.5, rely=0.05, anchor="n")
+
+        # Auto-destroy popup after 1.5 seconds
+        self.frame.after(1500, popup.destroy)
+
+    def show_worker_cannot_move_popup(self):
+        popup = Label(
+            self.frame,
+            text=f"This worker cannot move! Please select another worker",
             font=("Helvetica", 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
@@ -419,6 +466,48 @@ class GameScene(Scene):
                 text += "Waiting..."
 
         self.phase_info_label.config(text=text)
+
+    def show_loss_popup(self, player_id: int, reason: str, on_confirm: Callable[[], None]):
+        popup = Toplevel(self.frame)
+        popup.title("Player Eliminated")
+        popup.geometry("450x250")
+        popup.configure(bg="white")
+        popup.grab_set()  # Prevent interaction with main window
+
+        # Header
+        title = Label(
+            popup,
+            text=f"Player {player_id} has been eliminated!",
+            font=("Helvetica", 18, "bold"),
+            fg="#FF0000",
+            bg="white"
+        )
+        title.pack(pady=(20, 10))
+
+        # Reason
+        message = Label(
+            popup,
+            text=f"Reason: {reason}",
+            font=("Helvetica", 14),
+            bg="white",
+            wraplength=400,
+            justify="center"
+        )
+        message.pack(pady=10)
+
+        # Continue Button
+        continue_btn = Button(
+            popup,
+            text="Continue",
+            font=("Helvetica", 12),
+            command=lambda: self._handle_popup_close(popup, on_confirm)
+        )
+        continue_btn.pack(pady=20)
+
+    def _handle_popup_close(self, popup: Toplevel, on_confirm: Callable[[], None]):
+        popup.destroy()
+        on_confirm() #could be used to continue game with remaining players or show winner
+
 
     def show_god_info(self):
         current_player = GameManager.get_game().get_current_player()
