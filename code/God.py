@@ -1,29 +1,33 @@
 from abc import ABC, abstractmethod
 
+from MathLib.Vector import Vector2I
+from Worker import Worker
+
+
 class God(ABC):
     def __init__(self, name: str, description: str):
         self.name = name
         self.description = description
 
-    def on_worker_moved(self, worker, old_position, new_position, game_scene) -> bool:
+    def on_worker_moved(self, worker: Worker, old_position: Vector2I, new_position: Vector2I, game_scene) -> bool:
         """Called after a worker has moved.
         Return True if turn should continue (go to build), or False to allow another move.
         """
         return True
-    
-    def on_stack_built(self, worker, position, game_scene) -> bool:
+
+    def on_stack_built(self, worker: Worker, position: Vector2I, game_scene) -> bool:
         """Called after a stack has been built.
         Return True if turn should continue (go to build), or False to allow another move.
         """
         return True
 
     @abstractmethod
-    def modify_move(self, worker, board):
+    def modify_move(self, worker: Worker, board):
         """modify movement behavior."""
         pass
 
     @abstractmethod
-    def modify_build(self, worker, board):
+    def modify_build(self, worker: Worker, board):
         """modify building behavior."""
         pass
 
@@ -37,7 +41,7 @@ class Artemis(God):
         self.first_move_done = False
         self.initial_position = None
 
-    def on_worker_moved(self, worker, old_position, new_position, game_scene) -> bool:
+    def on_worker_moved(self, worker: Worker, old_position: Vector2I, new_position: Vector2I, game_scene) -> bool:
         if not self.first_move_done:
             self.initial_position = old_position
             self.first_move_done = True
@@ -55,10 +59,10 @@ class Artemis(God):
         self.first_move_done = False
         self.initial_position = None
 
-    def modify_move(self, worker, board):
+    def modify_move(self, worker: Worker, board):
         pass
 
-    def modify_build(self, worker, board):
+    def modify_build(self, worker: Worker, board):
         pass
 
 
@@ -71,7 +75,7 @@ class Demeter(God):
         self.first_build_done = False
         self.build_position = None
 
-    def on_stack_built(self, worker, position, game_scene) -> bool:
+    def on_stack_built(self, worker: Worker, position: Vector2I, game_scene) -> bool:
         if not self.first_build_done:
             self.build_position = position
             self.first_build_done = True
@@ -87,10 +91,8 @@ class Demeter(God):
             self.build_position = None
             return True
 
-    def modify_move(self, worker, board):
+    def modify_move(self, worker: Worker, board):
         pass
 
-    def modify_build(self, worker, board):
+    def modify_build(self, worker: Worker, board):
         pass
-
-    
