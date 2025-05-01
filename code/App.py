@@ -1,7 +1,7 @@
 import tkinter as tk
 
 import GameScene as GameScene
-from SceneID import SceneID
+from SceneSystem.SceneID import SceneID
 from SettingManager import SettingManager
 from SceneSystem.SceneManager import SceneManager
 import Scenes

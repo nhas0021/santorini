@@ -3,7 +3,7 @@ General Scenes go here, more complicated scenes should be moved to their own fil
 """
 import tkinter as tk
 from MathLib.Vector import Vector2I
-from SceneID import SceneID
+from SceneSystem.SceneID import SceneID
 from SettingManager import SettingManager
 from Styles import *
 

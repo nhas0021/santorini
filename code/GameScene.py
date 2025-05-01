@@ -12,7 +12,7 @@ from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
 from GameManager import GameManager
 from Worker import Worker
-from SceneID import SceneID
+from SceneSystem.SceneID import SceneID
 
 
 class Phase(Enum):
