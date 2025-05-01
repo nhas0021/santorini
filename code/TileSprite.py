@@ -1,11 +1,10 @@
-from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc, Tk, Frame
-from typing import Callable, List, Optional, Tuple
+from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc,  Frame
+from typing import Callable, List
 from MathLib.Vector import Vector2I
-from Worker import Worker
 from Styles import *
 
 
-class Tile:
+class TileSprite:
     """
     Tile UI (logic is in LogicTile)
     Defaults are what a tile is before anything happens on them.
@@ -20,9 +19,9 @@ class Tile:
         # ! Sprite / Data
         # ? Note: some of this might be better suited in styles
         self.stack_sprites: List[int] = []
-        self.dome_sprite: int = None
+        self.dome_sprite
         # * Note: Change colours for different players rather than make a new one
-        self.worker_sprite: int = None
+        self.worker_sprite
 
         self.scaled_tile_size = TILE_SIZE  # TODO add scaling
 

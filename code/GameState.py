@@ -1,52 +1,56 @@
-from random import sample
-from typing import Literal, Optional
+from typing import Optional
 from MathLib.Vector import Vector2I
-from SettingManager import SettingManager
-from Player import Player
 from Worker import Worker
-from LogicTile import LogicTile
-from TurnManager import TurnManager
+from TileState import TileState
 
 
-class Game:
-    # ensure number of players = number of gods
-    def __init__(self, player_count: int, size: Vector2I):
+class MapState:
+    def __init__(self, size: Vector2I, max_stacks_before_dome: int):
+        # ! Save match settings to this instance of a game (usually this is loaded from preferences)
+        self.max_stacks_before_dome = max_stacks_before_dome
         self.size = size
-        self._grid: list[list[LogicTile]] = [
-            [LogicTile(Vector2I(x, y)) for y in range(size.y)]
+
+        # * Generate map state
+        self._map_state: list[list[TileState]] = [
+            [TileState(Vector2I(x, y)) for y in range(size.y)]
             for x in range(size.x)
         ]
-        self.players: list[Player] = []
-        self.initialize_players(player_count)
-        self.turn_manager = TurnManager(self.players)
 
-    def initialize_players(self, count: int):
-        self.players.clear()
-        Player.reset_player_count()
+    # def startup_game(self):
+    #     # assert renderer
+    #     # self.renderer = renderer
+    #     self.place_random_workers()
+    #     # self.turn_manager.current_phase = Phase.SELECT_WORKER
+    #     # self.turn_manager.current_player_index = 0
 
-        for _ in range(count):
-            self.players.append(Player())
+    # def place_random_workers(self):
+    #     # Flatten the grid into a list of all tiles
+    #     all_tiles = [tile for row in self._map_state for tile in row]
 
-    def assign_gods_random_from_list(self):
-        if len(SettingManager.selectable_gods) < len(self.players):
-            print("Not enough unique gods for all players.")
-            return
+    #     # Shuffle tiles
+    #     shuffle(all_tiles)
 
-        rng_selected = sample(
-            # ? can also add weights
-            SettingManager.selectable_gods, len(self.players))
+    #     # --- Get all the workers ---
+    #     workers: List[Worker] = []
+    #     for player in self.players:
+    #         workers.extend(player.workers)
 
-        for (p, g) in zip(self.players, rng_selected):  # assign
-            p.assign_god(g)
+    #     # --- Place each worker on a tile ---
+    #     assert self.renderer
+    #     for worker, tile in zip(workers, all_tiles):
+    #         logic_tile = self.get_tile(tile.position)
+    #         logic_tile.worker = worker  # link the logic tile to the worker
+    #         worker.position = tile.position  # update worker's position
+    #         self.renderer.change_stack_visuals(worker.position)
 
     def get_tile(self, position: Vector2I):
-        return self._grid[position.x][position.y]
+        return self._map_state[position.x][position.y]
 
     def check_unoccupied_space(self, position: Vector2I):
         """
         From rulesheet: Unoccupied Space: A space not containing a worker or dome.
         """
-        if self.get_tile(position).stack_height >= SettingManager.max_stacks_before_dome+1:
+        if self.get_tile(position).stack_height >= self.max_stacks_before_dome+1:
             return False  # * dome check
 
         if self.get_tile(position).worker:
@@ -54,7 +58,7 @@ class Game:
 
         return True
 
-    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: int = None):
+    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: Optional[int] = None):
         # ! Ordered by speed for performance
         if worker.position == target_position:
             return False  # * cannot move to self
@@ -86,7 +90,7 @@ class Game:
         return True
 
     def check_if_winning_tile(self, position: Vector2I) -> Optional[Worker]:
-        if (winning_worker := self.get_tile(position).worker) and (self.get_tile(position).stack_height == SettingManager.max_stacks_before_dome):
+        if (winning_worker := self.get_tile(position).worker) and (self.get_tile(position).stack_height == self.max_stacks_before_dome):
             return winning_worker
         return None
 
@@ -103,11 +107,12 @@ class Game:
         tile = self.get_tile(position)
         tile.stack_height += 1
 
-    def get_current_player(self) -> Player:
-        return self.turn_manager.get_current_player()
-    
+    # def get_current_player(self) -> Player:
+    #     return self.turn_manager.get_current_player()
+
     def end_turn(self) -> None:
-        self.turn_manager.end_turn()
+        # TODO self.turn_manager.end_turn()
+        pass
 
     def can_worker_move(self, worker: Worker) -> bool:
         for pos in worker.position.get_adjacent_positions(self.size):
@@ -121,5 +126,5 @@ class Game:
                 return True
         return False
 
-    def can_player_move(self, player: Player) -> bool:
-        return any(self.can_worker_move(w) for w in player.workers)
+    # def can_player_move(self, player: Player) -> bool:
+    #     return any(self.can_worker_move(w) for w in player.workers)

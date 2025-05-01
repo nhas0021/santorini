@@ -1,16 +1,21 @@
-from GameLogic import Game
-from typing import Optional
-from SettingManager import SettingManager
+from GameState import MapState
+from typing import List, Optional, Type, cast
+from God import God
+from Preferences import Preferences
 
-#used to form connection between the actual game and UI elements, A singleton.
+# used to form connection between the actual game and UI elements, A singleton.
+
+
 class GameManager():
-    current_game: Optional[Game] = None
+    _current_game: Optional[MapState] = None
 
     @staticmethod
     def setup_game():
-        GameManager.current_game = Game(SettingManager.player_count, SettingManager.grid_size)
+
+        GameManager._current_game = MapState(
+            Preferences.player_count, cast(List[Type[God]], Preferences.gods_preferences), Preferences.grid_size, Preferences.max_stacks_before_dome)
 
     @staticmethod
-    def get_game() -> Game:
-        return GameManager.current_game
-        
+    def get_game():
+        assert GameManager._current_game
+        return GameManager._current_game

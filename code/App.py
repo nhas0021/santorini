@@ -2,23 +2,23 @@ import tkinter as tk
 
 import GameScene as GameScene
 from SceneID import SceneID
-from SettingManager import SettingManager
+from Preferences import Preferences
 from SceneSystem.SceneManager import SceneManager
 import Scenes
 
 if __name__ == "__main__":
 
+    Preferences()
     # region Launch Args
-    SettingManager()
-    SettingManager.load_defaults()
-    # ! load sys.argv
+    Preferences.load_defaults()
+    # ! load sys.argv if needed
     # endregion
 
     # region Generate Window
     ROOT = tk.Tk()
     ROOT.title("DEMO")
     ROOT.geometry(
-        f"{SettingManager.screen_size.x}x{SettingManager.screen_size.y}")
+        f"{Preferences.screen_size.x}x{Preferences.screen_size.y}")
 
     SceneManager()  # ! Start it
     # endregion

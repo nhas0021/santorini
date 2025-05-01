@@ -1,10 +1,12 @@
 """
 General Scenes go here, more complicated scenes should be moved to their own file
 """
+from random import sample
 import tkinter as tk
-from MathLib.Vector import Vector2I
+from typing import cast
+from God import God
 from SceneID import SceneID
-from SettingManager import SettingManager
+from Preferences import Preferences
 from Styles import *
 
 from SceneSystem.Scene import Scene
@@ -89,7 +91,7 @@ class PreGame(Scene):
         # Info Display (not editable yet)
         self.info_text = tk.Label(
             self.frame,
-            text=f"Number of Players: {SettingManager.player_count}\nGrid Size: {SettingManager.grid_size.x} x {SettingManager.grid_size.y}",
+            text=f"Number of Players: {Preferences.player_count}\nGrid Size: {Preferences.grid_size.x} x {Preferences.grid_size.y}",
             font=(FONT_GENERAL, 16),
             bg=WHITE,
             fg="#333333",
@@ -115,7 +117,7 @@ class PreGame(Scene):
             fg=WHITE,
             padx=20,
             pady=10,
-            command=self.start_god_assignment
+            command=self.confirm_players_and_go_to_assignment
         )
         self.start_button.pack(pady=30)
 
@@ -132,10 +134,13 @@ class PreGame(Scene):
         )
         self.back_button.pack(pady=20)
 
-    def start_god_assignment(self):
-        GameManager.setup_game()
-
-        # Go to the god assignment scene
+    def confirm_players_and_go_to_assignment(self):
+        if Preferences.player_count > len(Preferences.gods_preferences):
+            # * if there are more players than stored preferences slots
+            while len(Preferences.gods_preferences) < Preferences.player_count:
+                # * ensure that there is a preference slot (not yet filled)
+                Preferences.gods_preferences.append(None)
+        # * now that there are slots make sure they are assigned
         SceneManager.change_scene(SceneID.GOD_ASSIGNMENT)
 
 
@@ -169,7 +174,7 @@ class GodAssignment(Scene):
             fg=WHITE,
             padx=20,
             pady=10,
-            command=self.assign_gods
+            command=self.random_assign_god_preferences  # ! random for now
         )
         self.assign_button.pack(pady=30)
 
@@ -187,8 +192,7 @@ class GodAssignment(Scene):
             command=lambda: SceneManager.change_scene(SceneID.GAME)
         )
         self.start_game_button.pack(pady=20)
-        # TODO: Hide until gods are assigned
-        self.start_game_button.config(state=tk.NORMAL)
+        self.start_game_button.config(state=tk.DISABLED)
         # Back button
         self.back_button = tk.Button(
             self.frame,
@@ -202,8 +206,17 @@ class GodAssignment(Scene):
         )
         self.back_button.pack(pady=20)
 
-    def assign_gods(self):
-        GameManager.get_game().assign_gods_random_from_list()
+    def random_assign_god_preferences(self):
+        assert Preferences.player_count <= len(
+            Preferences.gods_selectable), "There are not enough heros to uniquely assign each player a different one"
+
+        randomly_selected_gods = sample(
+            # ? can also add weights
+            Preferences.gods_selectable, Preferences.player_count)
+
+        for i in range(len(Preferences.gods_preferences)):
+            # * apply the random allocation
+            Preferences.gods_preferences[i] = randomly_selected_gods[i]
 
         self.info_label.config(text="Gods assigned! See below:")
 
@@ -211,17 +224,21 @@ class GodAssignment(Scene):
         for widget in self.result_frame.winfo_children():
             widget.destroy()
 
-        for player in GameManager.get_game().players:
+        for i in range(len(Preferences.gods_preferences)):
+            assert Preferences.gods_preferences[i]
+            # ! Note: this was asserted to exist above
+            prefered_god_type = cast(God, Preferences.gods_preferences[i])
+
             player_label = tk.Label(
                 self.result_frame,
-                text=f"Player {player.id} ➝ {player.god.name}",
+                text=f"Player {i+1} ➝ {prefered_god_type.NAME}",
                 font=(FONT_GENERAL, 14),
                 bg=WHITE,
                 fg="#333333"
             )
             player_label.pack(anchor="w", pady=5)
 
-        self.start_game_button.config(state="normal")
+        self.start_game_button.config(state=tk.NORMAL)
 
     def start_game(self):
         # not a registered secne yet so throws an error

@@ -9,7 +9,7 @@ class Player:
 
     def __init__(self):
         Player.player_count += 1
-        self.god: God = None
+        self.god: God
         self.id = Player.player_count
         self.workers: list[Worker] = [Worker(self.id), Worker(self.id)]
 
