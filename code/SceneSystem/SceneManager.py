@@ -6,24 +6,19 @@ from SceneSystem.Scene import Scene
 
 class SceneManager:
     """
-    Motivation:
-    - Isolation of data:
-        - Allows for better encapusulation
-        - Hiding the various objects (scope-wise) within the scene (buttons and labels) from other scenes
-    - Standardised & Clean Transitions
-        - Allows for multiple people to work on different parts of the game without interference
-        - Clean way to change scenes
-
+    Handles the changing of scenes.
     """
     current_scene: Optional[Scene] = None
     scenes: Dict[BaseSceneID, Scene] = {}
 
     @staticmethod
     def register_scene(scene_id: BaseSceneID, scene: Scene) -> None:
+        """Add a scene to be able to be changed to."""
         SceneManager.scenes[scene_id] = scene
 
     @staticmethod
     def change_scene(scene_id: BaseSceneID) -> None:
+        """Change to the specified scene."""
         if SceneManager.current_scene is None:
             print(
                 f"Changing scene from N/A to {SceneManager.scenes[scene_id]}. (This may be an error)")

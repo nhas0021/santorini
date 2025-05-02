@@ -36,21 +36,3 @@ class TurnManager:
     def increment_player_turn(self):
         self.current_player_index = (
             self.current_player_index + 1) % len(self.players)
-
-    # def start_turn(self, game_state: MapState):
-    #     assert self.get_current_player().god
-    #     self.get_current_player().god.on_start_turn(game_state)
-
-    # def end_turn(self, game_state: MapState) -> None:
-    #     assert self.get_current_player().god
-    #     self.get_current_player().god.on_start_turn(game_state)
-        # current_player = self.get_current_player()
-        # if hasattr(current_player, "god") and current_player.god is not None:
-        #     god = current_player.god
-        #     if hasattr(god, "first_move_done"):
-        #         god.first_move_done = False
-        #     if hasattr(god, "initial_position"):
-        #         god.initial_position = None
-
-        # self.current_player_index = (
-        #     self.current_player_index + 1) % len(self.players)

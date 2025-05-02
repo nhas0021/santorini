@@ -22,24 +22,27 @@ class God:
         self.moved_to: Optional[Vector2I] = None
         self.build_on: Optional[Vector2I] = None
 
-    def clear_all_signals_in_phase(self,  game_scene: "GameScene"):
+    def clear_all_signals_in_phase(self, game_scene: "GameScene"):
+        """Remove all the stored singals that were used this phase."""
         for tile in game_scene.map_state.for_all_tiles():
             for signal in self._signals_in_phase:
                 if signal in tile.on_click_events:
                     tile.disconnect_on_click(signal)
 
     def after_selected_worker(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
+        """An overrideable (optional) event that is called after a valid tile with a worker is selected. """
         # * for_all remove callback: after_selected_worker
         self.clear_all_signals_in_phase(game_scene)
 
         self.initial_position = position
         self.selected_worker = game_scene.map_state.get_tile(position).worker
 
-        # TODO show highlight visuals
+        # * can trigger show highlight visuals here
 
         print(
             f"[Notice] Worker selected @ {position} : {self.selected_worker}")
 
+        assert self.selected_worker
         game_scene.highlight_selected_worker(self.selected_worker)
         game_scene.show_worker_selected_popup()
         game_scene.update_phase_info()
@@ -48,6 +51,7 @@ class God:
         self.on_start_current_phase(game_scene)
 
     def after_selected_move_to(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
+        """An overrideable (optional) event that is called after a valid tile to move to is selected."""
         # * for_all remove callback: after_selected_worker
         self.clear_all_signals_in_phase(game_scene)
 
@@ -82,6 +86,7 @@ class God:
         self.on_start_current_phase(game_scene)
 
     def after_selected_build(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
+        """An overrideable (optional) event that is called after a valid tile build on is selected."""
         # * for_all remove callback: after_selected_worker
         self.clear_all_signals_in_phase(game_scene)
 
@@ -177,9 +182,11 @@ class God:
                     assert self.selected_worker
                     # * valid move to
                     if exclude_moves is not None:
-                        valid = game_scene.map_state.validate_move_position(self.selected_worker, tile_state.position, excluded=exclude_moves)
+                        valid = game_scene.map_state.validate_move_position(
+                            self.selected_worker, tile_state.position, excluded=exclude_moves)
                     else:
-                        valid = game_scene.map_state.validate_move_position(self.selected_worker, tile_state.position)
+                        valid = game_scene.map_state.validate_move_position(
+                            self.selected_worker, tile_state.position)
                     if valid:
                         signal: Callable[[Event[Canvas], Vector2I], None] = lambda _event, _position: self.after_selected_move_to(
                             game_scene, _event, _position)
@@ -191,13 +198,16 @@ class God:
                 game_scene.update_phase_info()
                 game_scene.show_god_info()
             case Phase.BUILD_STACK:
-                exclude_builds = getattr(self, "tiles_built_on_this_turn", None)
+                exclude_builds = getattr(
+                    self, "tiles_built_on_this_turn", None)
                 for tile_state in game_scene.map_state.for_all_tiles():
                     assert self.selected_worker
                     if exclude_builds is not None:
-                        valid = game_scene.map_state.validate_build_position(self.selected_worker, tile_state.position, excluded=exclude_builds)
+                        valid = game_scene.map_state.validate_build_position(
+                            self.selected_worker, tile_state.position, excluded=exclude_builds)
                     else:
-                        valid = game_scene.map_state.validate_build_position(self.selected_worker, tile_state.position)
+                        valid = game_scene.map_state.validate_build_position(
+                            self.selected_worker, tile_state.position)
                     if valid:
                         signal: Callable[[Event[Canvas], Vector2I], None] = lambda _event, _position: self.after_selected_build(
                             game_scene, _event, _position)

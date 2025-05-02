@@ -38,6 +38,7 @@ class MapState:
         return True
 
     def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: Optional[int] = None, excluded: Optional[list[Vector2I]] = None):
+        """Check the rules in the rulesheet if the tile is valid for a worker to move to, can apply tiles to always be excluded (optional)"""
         if excluded and target_position in excluded:
             return False
         # ! Ordered by speed for performance
@@ -58,6 +59,7 @@ class MapState:
         return True
 
     def validate_build_position(self, worker: Worker, target_position: Vector2I, excluded: Optional[list[Vector2I]] = None):
+        """Check the rules in the rulesheet if the tile is valid for a worker to build on, can apply tiles to always be excluded (optional)"""
         if excluded and target_position in excluded:
             return False
         # ! Ordered by speed for performance
@@ -73,11 +75,13 @@ class MapState:
         return True
 
     def check_if_winning_tile(self, position: Vector2I) -> Optional[Worker]:
+        """Is there a winner on this tile"""
         if (winning_worker := self.get_tile(position).worker) and (self.get_tile(position).stack_height == self.max_stacks_before_dome):
             return winning_worker
         return None
 
     def move_worker(self, worker: Worker, new_position: Vector2I):
+        """Helper to move a worker"""
         old_tile = self.get_tile(worker.position) if worker.position else None
         new_tile = self.get_tile(new_position)
 
@@ -87,27 +91,20 @@ class MapState:
         worker.position = new_position
 
     def add_stack(self, position: Vector2I):
+        """Helper to add a stack (increment level)"""
         tile = self.get_tile(position)
         tile.stack_height += 1
 
-    # def get_current_player(self) -> Player:
-    #     return self.turn_manager.get_current_player()
-
-    def end_turn(self) -> None:
-        # TODO self.turn_manager.end_turn()
-        pass
-
     def can_worker_move(self, worker: Worker) -> bool:
+        """Check if the worker can move"""
         for pos in worker.position.get_adjacent_positions(self.size):
             if self.validate_move_position(worker, pos):
                 return True
         return False
 
     def can_worker_build(self, worker: Worker) -> bool:
+        """Check if the worker can build"""
         for pos in worker.position.get_adjacent_positions(self.size):
             if self.validate_build_position(worker, pos):
                 return True
         return False
-
-    # def can_player_move(self, player: Player) -> bool:
-    #     return any(self.can_worker_move(w) for w in player.workers)

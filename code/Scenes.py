@@ -22,11 +22,6 @@ class Title (Scene):
             self.frame, bg=BG_COLOUR, activebackground=BG_SUB_COLOUR, borderwidth=0, text="Click anywhere to start...", font=(FONT_GENERAL, 36),  fg=WHITE, justify="center", command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU))
         self.start_bg_button.pack(fill="both", expand=True)
 
-        # self._start_text = tk.Label(
-        #     self.frame, bg=BG_COLOUR, text="Click anywhere to start...", fg=WHITE, justify="center")
-        # self._start_text.place(relx=0.5, rely=0.5, anchor="center")
-
-
 class MainMenu(Scene):
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)

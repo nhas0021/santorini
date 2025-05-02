@@ -6,7 +6,7 @@ from MathLib.Vector import Vector2I
 from Preferences import Preferences
 from SceneID import SceneID
 from SceneSystem.SceneManager import SceneManager
-from Assets.Styles import *
+from Assets.Styles import BLACK, DIRT_COLOUR, FONT_GENERAL, FONT_TITLE, PLAYER_COLORS, POP_UP_COLOR, POPUP_DURATION, SAND_COLOUR, WATER_COLOUR, WHITE, WORKER_HEIGHT_PX, WORKER_WIDTH_PX
 from TileSprite import TileSprite
 from SceneSystem.Scene import Scene
 from TurnManager import Phase, TurnManager
@@ -14,9 +14,13 @@ from Worker import Worker
 
 
 class GameScene(Scene):
+    """
+    The main scene of the game, holding the renderables, the map data and the turn data.
+    """
+
     def __init__(self, root: Tk) -> None:
         super().__init__(root)
-        # ~ initialise data upon entering a scene
+        # ~ initialise data upon entering a scene not during scene creation
         self.turn_manager: TurnManager
         self.map_state: MapState
 
@@ -38,14 +42,15 @@ class GameScene(Scene):
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
         # endregion
         # region Generate popups
+        # ? A skip
         self.skip_action_button = Button(self.frame, text="Skip")
 
-        # show the current game phase
+        # ? Shows the current game phase
         self.info_panel = Frame(
             self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
         self.info_panel.place(relx=0.05, rely=0.3, anchor="w")
 
-        # Label inside the info panel
+        # ? Label inside the info panel
         self.phase_info_label = Label(
             self.info_panel,
             text="",
@@ -57,7 +62,7 @@ class GameScene(Scene):
         )
         self.phase_info_label.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Label for God info
+        # ? Label for God info
         self.god_panel = Frame(
             self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
         self.god_panel.place(relx=0.05, rely=0.7, anchor="w")
@@ -74,23 +79,26 @@ class GameScene(Scene):
         self.god_info_label.place(relx=0.5, rely=0.5, anchor="center")
         # endregion
         # region Generate Match Result Overlay
+        # ? The frame which the "game over" overlay consists of
         self.match_result_overlay = Frame(self.frame, bg=WHITE)
+
         self.match_result_overlay.pack(fill=BOTH, expand=True)
 
         self.match_result_overlay.pack_forget()  # * hide it
 
-        # Title
-        self.title_label = tk.Label(
+        self.title_label = Label(
             self.match_result_overlay,
             text="Game Over",
             font=(FONT_TITLE, 36, "bold"),
             bg=WHITE,
             fg="#FF0000"
         )
+
+        # ? Game Over Title
         self.title_label.pack(pady=40)
 
         # Winner label (created once here)
-        self.winner_label = tk.Label(
+        self.winner_label = Label(
             self.match_result_overlay,
             text="",  # Will be set later
             font=(FONT_GENERAL, 24, "bold"),
@@ -99,8 +107,8 @@ class GameScene(Scene):
         )
         self.winner_label.pack(pady=20)
 
-        # Return to Main Menu button
-        self.main_menu_button = tk.Button(
+        # ? Return to Main Menu button
+        self.main_menu_button = Button(
             self.match_result_overlay,
             text="Return to Main Menu",
             font=(FONT_GENERAL, 16),
@@ -117,15 +125,18 @@ class GameScene(Scene):
         return
 
     def enable_skip_button(self, action: Callable[[], None]):
+        """Attach and action to this button which is used to skip an optional action."""
         print("[Notice] Can skip this action.")
         self.skip_action_button.config(command=action)
         self.skip_action_button.place(relx=1, rely=1, anchor="se")
 
     def disable_skip_button(self):
-        self.skip_action_button.config(command=None)
+        """Disable this button"""
+        self.skip_action_button.config(command=lambda: None)
         self.skip_action_button.place_forget()
 
     def show_match_result(self):
+        """Show the match results, will display who won"""
         assert self.turn_manager
         assert self.turn_manager.winner
         self.match_result_overlay.pack(fill=BOTH, expand=True)
@@ -135,10 +146,15 @@ class GameScene(Scene):
         )
 
     def match_over(self):
+        """Event that is triggered when match is over"""
         print("[Notice] Match over.")
+        # * can add additional actions when needed
         self.show_match_result()
 
     def place_random_workers(self):
+        """
+        Randomly place workers in the map, with no overlap
+        """
         workers: List[Worker] = []
         for player in self.turn_manager.players:
             workers.extend(player.workers)
@@ -168,13 +184,6 @@ class GameScene(Scene):
         self.place_random_workers()
         self.turn_manager.get_current_player().god.on_start_turn(self)
         self.turn_manager.get_current_player().god.on_start_current_phase(self)
-        # self.turn_manager.start_turn(self.map_state)
-        # GameManager.setup_game()
-        # self.start_game(GameManager.get_game())
-        # self.show_player_turn_popup()
-        # self.highlight_current_players_workers()
-        # self.update_phase_info()
-        # self.show_god_info()
         return  # * control released to event calls
 
     def on_exit_scene(self):
@@ -182,7 +191,7 @@ class GameScene(Scene):
         self.match_result_overlay.pack_forget()
 
     def generate_tilemap_sprites(self, map_state: MapState):
-        # * Generate tilemap sprites
+        """ Generate tilemap sprites based on the map state"""
         assert map_state.size.x > 0
         assert map_state.size.y > 0
         self.map_size = map_state.size
@@ -195,147 +204,8 @@ class GameScene(Scene):
             for y in range(self.map_size.y)] for x in range(self.map_size.x)
         ]
 
-    # # * Note that tkinter is not fully typed
-    # def __on_clicked_tile(self, position: Vector2I, e: Event) -> None:
-    #     print(
-    #         f"[DEBUG] Clicked on tile at {position.x}-{position.y}, Phase: {self.current_phase}")
-
-    #     assert GameManager.current_game
-
-    #     # region Action
-    #     logic_tile = GameManager.current_game.get_tile(position)
-
-    #     match self.current_phase:
-    #         case Phase.SELECT_WORKER:
-    #             current_player = GameManager.get_game().get_current_player()
-
-    #             if logic_tile.worker:
-    #                 # Check if the worker the player is trying to select is the current player's worker
-    #                 if logic_tile.worker.player_id == current_player.id:
-
-    #                     # Check if the worker the player is trying to select can move
-    #                     if not GameManager.get_game().can_worker_move(logic_tile.worker):
-    #                         print(f"[DEBUG] This worker cannot move!")
-    #                         self.show_worker_cannot_move_popup()
-    #                     else:
-    #                         print(
-    #                             f"[DEBUG] Worker FOUND on tile {position.x}-{position.y}. Selecting worker.")
-    #                         self.selected_worker = logic_tile.worker
-    #                         self.show_worker_selected_popup()
-    #                         self.highlight_selected_worker()
-    #                         self.current_phase = Phase.MOVE_WORKER
-    #                         self.update_phase_info()
-    #                         self.show_god_info()
-    #                 else:
-    #                     self.show_cannot_select_worker_popup()
-    #                     print(f"[DEBUG] Cannot select other player's worker.")
-    #             else:
-    #                 print(
-    #                     f"[DEBUG] No worker found on tile {position.x}-{position.y}.")
-
-    #         case Phase.MOVE_WORKER:
-    #             if self.selected_worker:
-    #                 old_position = self.selected_worker.position
-
-    #                 logic_tile = GameManager.current_game.get_tile(position)
-
-    #                 if GameManager.current_game.validate_move_position(self.selected_worker, position):
-    #                     print(
-    #                         f"[DEBUG] Moving worker to {position.x}-{position.y}")
-    #                     GameManager.current_game.move_worker(
-    #                         self.selected_worker, position)
-    #                     self.change_stack_visuals(old_position)
-    #                     self.change_stack_visuals(position)
-
-    #                     god = GameManager.get_game().get_current_player().god
-    #                     proceed_to_build = True
-    #                     if god:
-    #                         proceed_to_build = god.on_worker_moved(
-    #                             self.selected_worker, old_position, position, self)
-
-    #                     if proceed_to_build:
-    #                         if GameManager.current_game.check_if_winning_tile(position):
-    #                             print("GAME WON")
-    #                             SceneManager.change_scene(SceneID.GAME_OVER)
-
-    #                         self.show_build_popup()
-    #                         self.highlight_selected_worker()
-
-    #                         # if moved worker cant build -> player loses
-    #                         if not GameManager.current_game.can_worker_build(self.selected_worker):
-    #                             print("GAME OVER")
-    #                             # show a pop up
-    #                             lost_player_id = GameManager.current_game.get_current_player().id
-    #                             GameManager.get_game().end_turn()
-    #                             self.show_loss_popup(
-    #                                 player_id=lost_player_id,
-    #                                 reason="Selected worker cannot build.",
-    #                                 on_confirm=lambda: SceneManager.change_scene(
-    #                                     SceneID.GAME_OVER)
-    #                             )
-
-    #                         self.current_phase = Phase.BUILD_STACK
-    #                         self.update_phase_info()
-    #                         self.show_god_info()
-    #                     else:
-    #                         self.highlight_selected_worker()
-    #                         self.show_worker_selected_popup()
-
-    #                 else:
-    #                     self.show_invalid_movement_popup()
-
-    #         case Phase.BUILD_STACK:
-    #             print(f"[DEBUG] Building on tile at {position.x}-{position.y}")
-
-    #             if self.selected_worker:
-    #                 if GameManager.current_game.validate_build_position(self.selected_worker, position):
-    #                     GameManager.current_game.add_stack(
-    #                         position)  # Update logic
-    #                     logic_tile = GameManager.current_game.get_tile(
-    #                         position)
-    #                     self.change_stack_visuals(
-    #                         position, logic_tile.stack_height)  # Update visuals
-
-    #                     god = GameManager.get_game().get_current_player().god
-    #                     next_turn = True
-    #                     if god:
-    #                         next_turn = god.on_stack_built(
-    #                             self.selected_worker, position, self)
-
-    #                     if next_turn:
-    #                         if GameManager.current_game.check_if_winning_tile(position):
-    #                             print("GAME WON")
-    #                             SceneManager.change_scene(SceneID.GAME_OVER)
-
-    #                         self.show_build_popup()
-    #                         self.highlight_selected_worker()
-    #                         self.current_phase = Phase.SELECT_WORKER
-    #                         self.selected_worker = None
-    #                         self.update_phase_info()
-    #                         self.show_god_info()
-    #                         GameManager.get_game().end_turn()
-    #                         self.highlight_current_players_workers()
-
-    #                         # if next player cant move any worker -> player loses
-    #                         if not GameManager.current_game.can_player_move(GameManager.current_game.get_current_player()):
-    #                             print("GAME OVER")
-    #                             lost_player_id = GameManager.current_game.get_current_player().id
-    #                             GameManager.get_game().end_turn()
-    #                             self.show_loss_popup(
-    #                                 player_id=lost_player_id,
-    #                                 reason="No available moves for any worker.",
-    #                                 on_confirm=lambda: SceneManager.change_scene(
-    #                                     SceneID.GAME_OVER)  # will change for a multiplayer game
-    #                             )
-
-    #                 else:
-    #                     self.show_invalid_build_popup()
-
-    #         case _:
-    #             raise Exception("Invalid game phase.")
-    #     # endregion
-
     def get_tile(self, position: Vector2I) -> TileSprite:
+        """Accessor for getting a tile using a vector"""
         assert self._sprite_tilemap
         return self._sprite_tilemap[position.x][position.y]
 
@@ -382,14 +252,14 @@ class GameScene(Scene):
                 tile_sprite.worker_sprite, state=HIDDEN)
 
     def cleanup(self):
-        # TODO reset everything
-        # TODO reset UI
+        """Is called at the end, clean up the scene so that it can be used again (as if new)"""
         self.map_size = None
         self._sprite_tilemap = None
         self.selected_worker = None
         self.current_phase = Phase.SELECT_WORKER
 
     def show_player_turn_popup(self):
+        """Display a timed popup message which informs which player's turn it is."""
         current_player = self.turn_manager.get_current_player()
         popup = Label(
             self.frame,
@@ -408,6 +278,7 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_cannot_select_worker_popup(self):
+        """A warning to show that the action is invalid"""
         popup = Label(
             self.frame,
             text=f"Cannot select another player's worker!",
@@ -425,6 +296,7 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_worker_cannot_move_popup(self):
+        """A warning to show that the action is invalid"""
         popup = Label(
             self.frame,
             text=f"This worker cannot move! Please select another worker",
@@ -442,6 +314,7 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def highlight_current_players_workers(self):
+        """Show which workers can be targeted of a specific player"""
         assert self._sprite_tilemap
 
         # First remove any old highlights
@@ -462,8 +335,9 @@ class GameScene(Scene):
             )
 
     def highlight_selected_worker(self, worker: Worker):
+        """Show which workers can be targeted"""
         assert self._sprite_tilemap
-        # Remove old highlights first
+        # * Remove old highlights first
         for row in self._sprite_tilemap:
             for tile in row:
                 tile.canvas.itemconfig(tile.worker_sprite, outline="", width=1)
@@ -471,7 +345,7 @@ class GameScene(Scene):
         if not worker:
             return
 
-        # Highlight the selected worker
+        # * Highlight the selected worker
         tile = self.get_tile(worker.position)
         tile.canvas.itemconfig(
             tile.worker_sprite,
@@ -480,6 +354,7 @@ class GameScene(Scene):
         )
 
     def show_worker_selected_popup(self):
+        """Inform the player what action to take"""
         popup = Label(
             self.frame,
             text=f"Worker Selected! Move your worker...",
@@ -493,10 +368,11 @@ class GameScene(Scene):
         )
         popup.place(relx=0.5, rely=0.05, anchor="n")
 
-        # Auto-destroy popup after delay
+        # ? Auto-destroy popup after delay
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_build_popup(self):
+        """Inform the player what action to take"""
         popup = Label(
             self.frame,
             text=f"Worker Moved! Click on an adjacent tile to build...",
@@ -514,6 +390,7 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_invalid_movement_popup(self):
+        """Inform the player that the action is invalid"""
         popup = Label(
             self.frame,
             text=f"Worker cannot be moved here! Please try Again.",
@@ -531,6 +408,7 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def show_invalid_build_popup(self):
+        """Inform the player that the action is invalid"""
         popup = Label(
             self.frame,
             text=f"Cannot build here! Please try Again.",
@@ -548,6 +426,7 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def update_phase_info(self):
+        """Update the widget with the new turn info"""
         current_player = self.turn_manager.get_current_player()
         text = f"Player {current_player.id + 1}'s Turn\n\n"
 
@@ -564,6 +443,7 @@ class GameScene(Scene):
         self.phase_info_label.config(text=text)
 
     def show_loss_popup(self, player_id: int, reason: str, on_confirm: Callable[[], None]):
+        """Show a popup upon reaching a loss condition"""
         popup = Toplevel(self.frame)
         popup.title("Player Eliminated")
         popup.geometry("450x250")
@@ -601,10 +481,12 @@ class GameScene(Scene):
         continue_btn.pack(pady=20)
 
     def _handle_popup_close(self, popup: Toplevel, on_confirm: Callable[[], None]):
+        """Event that is triggered on to close a popup"""
         popup.destroy()
         on_confirm()  # could be used to continue game with remaining players or show winner
 
     def show_god_info(self):
+        """Enable a card to show god info"""
         current_player = self.turn_manager.get_current_player()
         text = f"God: {current_player.god.NAME}\n\n{current_player.god.DESCRIPTION}"
 

@@ -3,6 +3,7 @@ from SceneSystem.BaseSceneID import BaseSceneID
 
 
 class SceneID(BaseSceneID, Enum):
+    """Our custom scenes"""
     TITLE = 1
     MAIN_MENU = 2
     TUTORIAL = 3
