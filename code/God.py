@@ -41,7 +41,7 @@ class God:
             f"[Notice] Worker selected @ {position} : {self.selected_worker}")
 
         game_scene.turn_manager.current_phase = Phase.MOVE_WORKER
-        self.on_setup_phase(game_scene)
+        self.on_start_current_phase(game_scene)
 
     def after_selected_move_to(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
         # * for_all remove callback: after_selected_worker
@@ -56,6 +56,8 @@ class God:
         game_scene.map_state.get_tile(self.initial_position).worker = None
         game_scene.map_state.get_tile(
             self.moved_to).worker = self.selected_worker
+        assert self.selected_worker
+        self.selected_worker.position = self.moved_to
 
         game_scene.update_tile_visuals(self.initial_position)
         game_scene.update_tile_visuals(self.moved_to)
@@ -64,7 +66,7 @@ class God:
             f"[Notice] Worker {self.selected_worker} moved : {self.initial_position} >> {self.moved_to}")
 
         game_scene.turn_manager.current_phase = Phase.BUILD_STACK
-        self.on_setup_phase(game_scene)
+        self.on_start_current_phase(game_scene)
 
     def after_selected_build(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
         # * for_all remove callback: after_selected_worker
@@ -81,7 +83,7 @@ class God:
             f"[Notice] Worker {self.selected_worker} built @ {self.build_on}")
 
         game_scene.turn_manager.current_phase = Phase.TURN_END
-        self.on_setup_phase(game_scene)
+        self.on_start_current_phase(game_scene)
 
     # def on_worker_moved(self, worker: Worker, old_position: Vector2I, new_position: Vector2I, game_scene) -> bool:
     #     """Called after a worker has moved.
@@ -100,18 +102,22 @@ class God:
         Variables should be initialised if needed, UI elements reset or triggered
         """
         print(f"{self.NAME} has started its turn.")
-        self.on_setup_phase(game_scene)
+
+        self.on_start_current_phase(game_scene)
 
     def on_end_turn(self, game_scene: "GameScene"):
         """
         Variables should be cleaned up if needed, UI elements reset or triggered
         """
         print(f"{self.NAME} has ended its turn.")
+
         self.selected_worker = None
         self.moved_to = None
         self.build_on = None
 
-    def on_setup_phase(self, game_scene: "GameScene"):
+        self.on_start_current_phase(game_scene)
+
+    def on_start_current_phase(self, game_scene: "GameScene"):
         """
         Setup callbacks at the START of a phase - before anything else happens.
 
@@ -127,12 +133,12 @@ class God:
         match game_scene.turn_manager.current_phase:
             case Phase.TURN_START:
                 game_scene.turn_manager.current_phase = Phase.SELECT_WORKER
-                self.on_setup_phase(game_scene)
+                self.on_start_current_phase(game_scene)
             case Phase.TURN_END:
                 # ? Turn over to next player
                 game_scene.turn_manager.current_phase = Phase.TURN_START
                 game_scene.turn_manager.increment_player_turn()
-                self.on_setup_phase(game_scene)
+                self.on_end_turn(game_scene)
 
             case Phase.SELECT_WORKER:
                 # * for_all( if tile has worker add callback: after_selected_worker )
