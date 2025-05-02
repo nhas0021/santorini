@@ -179,6 +179,7 @@ class GameScene(Scene):
 
     def on_exit_scene(self):
         self.cleanup()
+        self.match_result_overlay.pack_forget()
 
     def generate_tilemap_sprites(self, map_state: MapState):
         # * Generate tilemap sprites
