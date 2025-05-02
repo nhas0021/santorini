@@ -65,7 +65,7 @@ class MainMenu(Scene):
 
         # image
         # Replace with your image path
-        self.board_image = tk.PhotoImage(file="Assets/santorini.png")
+        self.board_image = tk.PhotoImage(file="Resources/Assets/santorini.png")
         self.image_label = tk.Label(
             self.frame, image=self.board_image, bg=WHITE)
         self.image_label.place(relx=0.7, rely=0.6, anchor="center")

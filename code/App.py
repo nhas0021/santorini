@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # region Generate Window
     ROOT = tk.Tk()
-    ROOT.title("DEMO")
+    ROOT.title("Santorini")
     ROOT.geometry(
         f"{Preferences.screen_size.x}x{Preferences.screen_size.y}")
 
