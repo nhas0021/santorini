@@ -37,7 +37,9 @@ class MapState:
 
         return True
 
-    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: Optional[int] = None):
+    def validate_move_position(self, worker: Worker, target_position: Vector2I, max_step_up: int = 1, max_step_down: Optional[int] = None, excluded: Optional[list[Vector2I]] = None):
+        if excluded and target_position in excluded:
+            return False
         # ! Ordered by speed for performance
         if worker.position == target_position:
             return False  # * cannot move to self
@@ -55,7 +57,9 @@ class MapState:
 
         return True
 
-    def validate_build_position(self, worker: Worker, target_position: Vector2I):
+    def validate_build_position(self, worker: Worker, target_position: Vector2I, excluded: Optional[list[Vector2I]] = None):
+        if excluded and target_position in excluded:
+            return False
         # ! Ordered by speed for performance
         if worker.position == target_position:
             return False  # * cannot buiild to self

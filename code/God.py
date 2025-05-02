@@ -172,10 +172,15 @@ class God:
                 game_scene.show_god_info()
 
             case Phase.MOVE_WORKER:
+                exclude_moves = getattr(self, "tiles_moved_this_turn", None)
                 for tile_state in game_scene.map_state.for_all_tiles():
                     assert self.selected_worker
                     # * valid move to
-                    if game_scene.map_state.validate_move_position(self.selected_worker, tile_state.position):
+                    if exclude_moves is not None:
+                        valid = game_scene.map_state.validate_move_position(self.selected_worker, tile_state.position, excluded=exclude_moves)
+                    else:
+                        valid = game_scene.map_state.validate_move_position(self.selected_worker, tile_state.position)
+                    if valid:
                         signal: Callable[[Event[Canvas], Vector2I], None] = lambda _event, _position: self.after_selected_move_to(
                             game_scene, _event, _position)
                         tile_state.connect_on_click(signal)
@@ -186,9 +191,14 @@ class God:
                 game_scene.update_phase_info()
                 game_scene.show_god_info()
             case Phase.BUILD_STACK:
+                exclude_builds = getattr(self, "tiles_built_on_this_turn", None)
                 for tile_state in game_scene.map_state.for_all_tiles():
                     assert self.selected_worker
-                    if game_scene.map_state.validate_build_position(self.selected_worker, tile_state.position):
+                    if exclude_builds is not None:
+                        valid = game_scene.map_state.validate_build_position(self.selected_worker, tile_state.position, excluded=exclude_builds)
+                    else:
+                        valid = game_scene.map_state.validate_build_position(self.selected_worker, tile_state.position)
+                    if valid:
                         signal: Callable[[Event[Canvas], Vector2I], None] = lambda _event, _position: self.after_selected_build(
                             game_scene, _event, _position)
                         tile_state.connect_on_click(signal)
@@ -219,6 +229,7 @@ class Artemis(God):
     def __init__(self):
         super().__init__()
         self.moved_to_second: Optional[Vector2I] = None
+        self.tiles_moved_this_turn: list[Vector2I] = []
 
     def after_selected_move_to(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
         # * for_all remove callback: after_selected_worker
@@ -227,6 +238,7 @@ class Artemis(God):
         if not self.moved_to:
             # * regular
             self.moved_to = position
+            self.tiles_moved_this_turn.append(position)
             assert self.initial_position
             assert self.moved_to
 
@@ -261,6 +273,7 @@ class Artemis(God):
             # * ability (2nd move)
             game_scene.disable_skip_button()  # ? was not used, remove
             self.moved_to_second = position
+            self.tiles_moved_this_turn.append(position)
             assert self.moved_to_second
 
             assert game_scene.map_state.get_tile(
@@ -287,8 +300,8 @@ class Artemis(God):
 
     def on_start_turn(self,  game_scene: "GameScene"):
         super().on_start_turn(game_scene)
-
         self.moved_to_second = None
+        self.tiles_moved_this_turn = []
 
 
 class Demeter(God):
@@ -298,11 +311,12 @@ class Demeter(God):
     def __init__(self):
         super().__init__()
         self.build_on_second: Optional[Vector2I] = None
+        self.tiles_built_on_this_turn: list[Vector2I] = []
 
     def on_start_turn(self,  game_scene: "GameScene"):
         super().on_start_turn(game_scene)
-
         self.build_on_second = None
+        self.tiles_built_on_this_turn = []
 
     def after_selected_build(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
         # * for_all remove callback: after_selected_worker
@@ -311,6 +325,7 @@ class Demeter(God):
         if not self.build_on:
             # * first build
             self.build_on = position
+            self.tiles_built_on_this_turn.append(position)
 
             game_scene.map_state.get_tile(
                 self.build_on).stack_height += 1
@@ -334,6 +349,7 @@ class Demeter(God):
             # * second (ability) build
             game_scene.disable_skip_button()  # ? was not used, remove
             self.build_on_second = position
+            self.tiles_built_on_this_turn.append(position)
 
             game_scene.map_state.get_tile(
                 self.build_on_second).stack_height += 1

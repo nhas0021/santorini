@@ -393,7 +393,7 @@ class GameScene(Scene):
         current_player = self.turn_manager.get_current_player()
         popup = Label(
             self.frame,
-            text=f"Player {current_player.id}'s Turn!",
+            text=f"Player {current_player.id+1}'s Turn!",
             font=(FONT_GENERAL, 18, "bold"),
             bg=POP_UP_COLOR,  # light yellow
             fg="#333",
@@ -573,7 +573,7 @@ class GameScene(Scene):
         # Header
         title = Label(
             popup,
-            text=f"Player {player_id} has been eliminated!",
+            text=f"Player {player_id + 1} has been eliminated!",
             font=(FONT_GENERAL, 18, "bold"),
             fg="#FF0000",
             bg=WHITE
