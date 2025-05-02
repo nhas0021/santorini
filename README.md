@@ -14,6 +14,9 @@ User Stories: https://docs.google.com/document/d/1qGGDGRkIJO3NXx3LltwrCCSCGYfNwY
 - pyinstaller
 	- `pip install pyinstaller` ([See More](https://pyinstaller.org/en/stable/index.html))
 ## Build Steps (Windows)
+### Auto
+Run `build.bat`
+### Manual
 1) Ensure current directory is `./code/` (from top level: `cd ./code`)
-2) Build `pyinstaller App.py -n Santorini --onefile --add-data "Assets:assets"`
+2) Build `pyinstaller .\App.py --onefile --name Santorini --contents-directory Resources --hidden-import=tkinter --add-data ./Assets:Assets`
 3) Run by clicking on the executable in `./dist` or `./dist/Santorini.exe`
