@@ -63,11 +63,12 @@ class God:
         game_scene.update_tile_visuals(self.moved_to)
 
         print(
-            f"[Notice] Worker {self.selected_worker} moved : {self.initial_position} >> {self.moved_to}")
-        
+            f"[Notice] Worker {self.selected_worker} moved : {self.initial_position} >>> {self.moved_to}")
+
         # ! "The first player to move up to a level-3 tower wins!"
         if game_scene.map_state.check_if_winning_tile(self.moved_to):
             print("TODO WIN")
+            return
 
         game_scene.turn_manager.current_phase = Phase.BUILD_STACK
         self.on_start_current_phase(game_scene)
@@ -88,18 +89,6 @@ class God:
 
         game_scene.turn_manager.current_phase = Phase.TURN_END
         self.on_start_current_phase(game_scene)
-
-    # def on_worker_moved(self, worker: Worker, old_position: Vector2I, new_position: Vector2I, game_scene) -> bool:
-    #     """Called after a worker has moved.
-    #     Return True if turn should continue (go to build), or False to allow another move.
-    #     """
-    #     return True
-
-    # def on_stack_built(self, worker: Worker, position: Vector2I, game_scene) -> bool:
-    #     """Called after a stack has been built.
-    #     Return True if turn should continue (go to build), or False to allow another move.
-    #     """
-    #     return True
 
     def on_start_turn(self, game_scene: "GameScene"):
         """
@@ -182,6 +171,7 @@ class God:
                         valid_move_exists = True
         if not valid_move_exists:
             print("TODO LOSE STALEMATE")
+            return
 
 
 class Blank(God):
