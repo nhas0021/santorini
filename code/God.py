@@ -64,6 +64,10 @@ class God:
 
         print(
             f"[Notice] Worker {self.selected_worker} moved : {self.initial_position} >> {self.moved_to}")
+        
+        # ! "The first player to move up to a level-3 tower wins!"
+        if game_scene.map_state.check_if_winning_tile(self.moved_to):
+            print("TODO WIN")
 
         game_scene.turn_manager.current_phase = Phase.BUILD_STACK
         self.on_start_current_phase(game_scene)
