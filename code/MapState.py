@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from MathLib.Vector import Vector2I
 from Worker import Worker
 from TileState import TileState

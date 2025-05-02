@@ -1,5 +1,4 @@
 from typing import List, Optional, Type, cast
-# from ActionRecord import ActionRecord
 from God import God
 from Player import Player
 from TurnPhase import Phase
@@ -17,7 +16,6 @@ class TurnManager:
         self.current_player_index = 0
         self.current_phase: Phase = Phase.TURN_START
 
-        # self._turn_history: Optional[List[List[List[ActionRecord]]]] = None
 
     def _initialize_players(self, count: int, player_gods_preferences: List[Optional[Type[God]]]):
         self.players.clear()
@@ -30,14 +28,6 @@ class TurnManager:
             self.players[i].assign_god(
                 cast(Type[God], player_gods_preferences[i])())
 
-    # def get_turn_history(self, turn_number: int, player_index: int):
-    #     assert self._turn_history
-    #     return self._turn_history[turn_number][player_index]
-
-    # def increment_turn_record(self):
-    #     if not self._turn_history:
-    #         self._turn_history = [[] for _ in self.players]
-    #     self._turn_history.append([[] for _ in self.players])
 
     def get_current_player(self) -> Player:
         return self.players[self.current_player_index]
