@@ -450,7 +450,7 @@ class GameScene(Scene):
                 tile.canvas.itemconfig(tile.worker_sprite, outline="", width=1)
 
         # Highlight current player's workers
-        current_player = GameManager.get_game().get_current_player()
+        current_player = self.turn_manager.get_current_player()
 
         for worker in current_player.workers:
             tile = self.get_tile(worker.position)
@@ -461,18 +461,18 @@ class GameScene(Scene):
                 width=5
             )
 
-    def highlight_selected_worker(self):
+    def highlight_selected_worker(self, worker: Worker):
         assert self._sprite_tilemap
         # Remove old highlights first
         for row in self._sprite_tilemap:
             for tile in row:
                 tile.canvas.itemconfig(tile.worker_sprite, outline="", width=1)
 
-        if not self.selected_worker:
+        if not worker:
             return
 
         # Highlight the selected worker
-        tile = self.get_tile(self.selected_worker.position)
+        tile = self.get_tile(worker.position)
         tile.canvas.itemconfig(
             tile.worker_sprite,
             outline="red",  # Use blue or any visible color
@@ -548,10 +548,10 @@ class GameScene(Scene):
         self.frame.after(POPUP_DURATION, popup.destroy)
 
     def update_phase_info(self):
-        current_player = GameManager.get_game().get_current_player()
-        text = f"Player {current_player.id}'s Turn\n\n"
+        current_player = self.turn_manager.get_current_player()
+        text = f"Player {current_player.id + 1}'s Turn\n\n"
 
-        match self.current_phase:
+        match self.turn_manager.current_phase:
             case Phase.SELECT_WORKER:
                 text += "Select one of your workers"
             case Phase.MOVE_WORKER:
@@ -605,7 +605,7 @@ class GameScene(Scene):
         on_confirm()  # could be used to continue game with remaining players or show winner
 
     def show_god_info(self):
-        current_player = GameManager.get_game().get_current_player()
+        current_player = self.turn_manager.get_current_player()
         text = f"God: {current_player.god.NAME}\n\n{current_player.god.DESCRIPTION}"
 
         self.god_info_label.config(text=text)

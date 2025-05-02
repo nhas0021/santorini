@@ -40,6 +40,10 @@ class God:
         print(
             f"[Notice] Worker selected @ {position} : {self.selected_worker}")
 
+        game_scene.highlight_selected_worker(self.selected_worker)
+        game_scene.show_worker_selected_popup()
+        game_scene.update_phase_info()
+
         game_scene.turn_manager.current_phase = Phase.MOVE_WORKER
         self.on_start_current_phase(game_scene)
 
@@ -61,6 +65,10 @@ class God:
 
         game_scene.update_tile_visuals(self.initial_position)
         game_scene.update_tile_visuals(self.moved_to)
+
+        game_scene.show_build_popup()
+        game_scene.highlight_selected_worker(self.selected_worker)
+        game_scene.update_phase_info()
 
         print(
             f"[Notice] Worker {self.selected_worker} moved : {self.initial_position} >>> {self.moved_to}")
@@ -84,6 +92,8 @@ class God:
 
         game_scene.update_tile_visuals(self.build_on)
 
+        game_scene.update_phase_info()
+
         print(
             f"[Notice] Worker {self.selected_worker} built @ {self.build_on}")
 
@@ -100,6 +110,11 @@ class God:
         self.initial_position = None
         self.moved_to = None
         self.build_on = None
+
+        game_scene.show_player_turn_popup()
+        game_scene.highlight_current_players_workers()
+        game_scene.update_phase_info()
+        game_scene.show_god_info()
 
     def on_end_turn(self, game_scene: "GameScene"):
         """
@@ -153,6 +168,8 @@ class God:
                         tile_state.connect_on_click(signal)
                         self._signals_in_phase.append(signal)
                         valid_move_exists = True
+                game_scene.update_phase_info()
+                game_scene.show_god_info()
 
             case Phase.MOVE_WORKER:
                 for tile_state in game_scene.map_state.for_all_tiles():
@@ -166,6 +183,8 @@ class God:
                         valid_move_exists = True
                     else:
                         pass  # attach warning signal
+                game_scene.update_phase_info()
+                game_scene.show_god_info()
             case Phase.BUILD_STACK:
                 for tile_state in game_scene.map_state.for_all_tiles():
                     assert self.selected_worker
@@ -175,6 +194,8 @@ class God:
                         tile_state.connect_on_click(signal)
                         self._signals_in_phase.append(signal)
                         valid_move_exists = True
+                game_scene.update_phase_info()
+                game_scene.show_god_info()
         if not valid_move_exists:
             print("[Notice] Player lost, no valid actions (stalemate).")
             game_scene.turn_manager.losers.append(
