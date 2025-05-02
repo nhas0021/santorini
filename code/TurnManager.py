@@ -16,6 +16,8 @@ class TurnManager:
         self.current_player_index = 0
         self.current_phase: Phase = Phase.TURN_START
 
+        self.winner: Optional[Player] = None
+        self.losers: List[Player] = []
 
     def _initialize_players(self, count: int, player_gods_preferences: List[Optional[Type[God]]]):
         self.players.clear()
@@ -27,7 +29,6 @@ class TurnManager:
             assert player_gods_preferences[i]
             self.players[i].assign_god(
                 cast(Type[God], player_gods_preferences[i])())
-
 
     def get_current_player(self) -> Player:
         return self.players[self.current_player_index]

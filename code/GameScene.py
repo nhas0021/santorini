@@ -1,9 +1,11 @@
 from random import sample
-from tkinter import NORMAL, HIDDEN, Tk, Frame, Label, Toplevel, Button
-from typing import Callable, List, Optional
+from tkinter import BOTH, NORMAL, HIDDEN, Tk, Frame, Label, Toplevel, Button
+from typing import Callable, List, Optional, cast
 from MapState import MapState
 from MathLib.Vector import Vector2I
 from Preferences import Preferences
+from SceneID import SceneID
+from SceneSystem.SceneManager import SceneManager
 from Styles import *
 from TileSprite import TileSprite
 from SceneSystem.Scene import Scene
@@ -11,8 +13,6 @@ from TurnManager import Phase, TurnManager
 from Worker import Worker
 
 
-# TODO: make the Game class hold the grid and not GameScene. use the GameManager to access the grid from the Game here in order to draw it out (this class should only handle UI)
-# TODO: Remove any game logic
 class GameScene(Scene):
     def __init__(self, root: Tk) -> None:
         super().__init__(root)
@@ -25,9 +25,7 @@ class GameScene(Scene):
         # region Generate background / environment sprites
         self.frame.config(background=WATER_COLOUR)
 
-        # self.map_size: Optional[Vector2I] = None
-
-        # ! Note: Acess should be [x][y].
+        # ! Note: Access should be [x][y].
         self._sprite_tilemap: Optional[list[list[TileSprite]]] = None
 
         self.map_frame: Frame = Frame(
@@ -39,8 +37,9 @@ class GameScene(Scene):
 
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
         # endregion
-
         # region Generate popups
+        self.skip_action_button = Button(self.frame, text="Skip")
+
         # show the current game phase
         self.info_panel = Frame(
             self.frame, width=200, height=200, bg=POP_UP_COLOR, bd=2, relief="solid")
@@ -74,8 +73,70 @@ class GameScene(Scene):
         )
         self.god_info_label.place(relx=0.5, rely=0.5, anchor="center")
         # endregion
+        # region Generate Match Result Overlay
+        self.match_result_overlay = Frame(self.frame, bg=WHITE)
+        self.match_result_overlay.pack(fill=BOTH, expand=True)
+
+        self.match_result_overlay.pack_forget()  # * hide it
+
+        # Title
+        self.title_label = tk.Label(
+            self.match_result_overlay,
+            text="Game Over",
+            font=(FONT_TITLE, 36, "bold"),
+            bg=WHITE,
+            fg="#FF0000"
+        )
+        self.title_label.pack(pady=40)
+
+        # Winner label (created once here)
+        self.winner_label = tk.Label(
+            self.match_result_overlay,
+            text="",  # Will be set later
+            font=(FONT_GENERAL, 24, "bold"),
+            bg=WHITE,
+            fg="#2E8B57"
+        )
+        self.winner_label.pack(pady=20)
+
+        # Return to Main Menu button
+        self.main_menu_button = tk.Button(
+            self.match_result_overlay,
+            text="Return to Main Menu",
+            font=(FONT_GENERAL, 16),
+            bg="#ADD8E6",
+            fg=BLACK,
+            padx=20,
+            pady=10,
+            command=lambda: SceneManager.change_scene(SceneID.MAIN_MENU)
+        )
+        self.main_menu_button.pack(pady=30)
+
+        # endregion
         # endregion
         return
+
+    def enable_skip_button(self, action: Callable[[], None]):
+        print("[Notice] Can skip this action.")
+        self.skip_action_button.config(command=action)
+        self.skip_action_button.place(relx=1, rely=1, anchor="se")
+
+    def disable_skip_button(self):
+        self.skip_action_button.config(command=None)
+        self.skip_action_button.place_forget()
+
+    def show_match_result(self):
+        assert self.turn_manager
+        assert self.turn_manager.winner
+        self.match_result_overlay.pack(fill=BOTH, expand=True)
+
+        self.winner_label.config(
+            text=f"🎉 Player {self.turn_manager.winner.id + 1} Wins! 🎉"
+        )
+
+    def match_over(self):
+        print("[Notice] Match over.")
+        self.show_match_result()
 
     def place_random_workers(self):
         workers: List[Worker] = []
@@ -106,6 +167,7 @@ class GameScene(Scene):
         # ! set up for first turn
         self.place_random_workers()
         self.turn_manager.get_current_player().god.on_start_turn(self)
+        self.turn_manager.get_current_player().god.on_start_current_phase(self)
         # self.turn_manager.start_turn(self.map_state)
         # GameManager.setup_game()
         # self.start_game(GameManager.get_game())

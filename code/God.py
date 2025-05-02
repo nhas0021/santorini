@@ -67,8 +67,8 @@ class God:
 
         # ! "The first player to move up to a level-3 tower wins!"
         if game_scene.map_state.check_if_winning_tile(self.moved_to):
-            print("TODO WIN")
-            return
+            game_scene.turn_manager.winner = game_scene.turn_manager.get_current_player()
+            game_scene.match_over()
 
         game_scene.turn_manager.current_phase = Phase.BUILD_STACK
         self.on_start_current_phase(game_scene)
@@ -92,23 +92,20 @@ class God:
 
     def on_start_turn(self, game_scene: "GameScene"):
         """
-        Variables should be initialised if needed, UI elements reset or triggered
+        Variables should be reset at the start of a turn if needed, UI elements reset or triggered
         """
         print(f"{self.NAME} has started its turn.")
 
-        self.on_start_current_phase(game_scene)
+        self.selected_worker = None
+        self.initial_position = None
+        self.moved_to = None
+        self.build_on = None
 
     def on_end_turn(self, game_scene: "GameScene"):
         """
         Variables should be cleaned up if needed, UI elements reset or triggered
         """
         print(f"{self.NAME} has ended its turn.")
-
-        self.selected_worker = None
-        self.moved_to = None
-        self.build_on = None
-
-        self.on_start_current_phase(game_scene)
 
     def on_start_current_phase(self, game_scene: "GameScene"):
         """
@@ -126,6 +123,13 @@ class God:
             f"[Notice] Current phase is {game_scene.turn_manager.current_phase}")
 
         valid_move_exists = False
+        while game_scene.turn_manager.get_current_player() in game_scene.turn_manager.losers:
+            game_scene.turn_manager.increment_player_turn()  # * skip turn if already lost
+            if game_scene.turn_manager.get_current_player() not in game_scene.turn_manager.losers and len(game_scene.turn_manager.losers) + 1 == len(game_scene.turn_manager.players):  # * last player standing
+                game_scene.turn_manager.winner = game_scene.turn_manager.get_current_player()
+                game_scene.match_over()
+                return
+
         match game_scene.turn_manager.current_phase:
             case Phase.TURN_START:
                 game_scene.turn_manager.current_phase = Phase.SELECT_WORKER
@@ -134,8 +138,10 @@ class God:
             case Phase.TURN_END:
                 # ? Turn over to next player
                 game_scene.turn_manager.current_phase = Phase.TURN_START
-                game_scene.turn_manager.increment_player_turn()
                 self.on_end_turn(game_scene)
+                game_scene.turn_manager.increment_player_turn()
+                game_scene.turn_manager.get_current_player().god.on_start_turn(game_scene)
+                game_scene.turn_manager.get_current_player().god.on_start_current_phase(game_scene)
                 valid_move_exists = True
 
             case Phase.SELECT_WORKER:
@@ -170,7 +176,13 @@ class God:
                         self._signals_in_phase.append(signal)
                         valid_move_exists = True
         if not valid_move_exists:
-            print("TODO LOSE STALEMATE")
+            print("[Notice] Player lost, no valid actions (stalemate).")
+            game_scene.turn_manager.losers.append(
+                game_scene.turn_manager.get_current_player())
+            game_scene.turn_manager.increment_player_turn()
+
+            game_scene.turn_manager.current_phase = Phase.TURN_END
+            self.on_start_current_phase(game_scene)
             return
 
 
@@ -185,27 +197,77 @@ class Artemis(God):
 
     def __init__(self):
         super().__init__()
-        # self.first_move_done = False
-        # self.initial_position = None
+        self.moved_to_second: Optional[Vector2I] = None
 
-    # def on_worker_moved(self, worker: Worker, old_position: Vector2I, new_position: Vector2I, game_scene) -> bool:
-    #     if not self.first_move_done:
-    #         self.initial_position = old_position
-    #         self.first_move_done = True
-    #         game_scene.update_phase_info()
-    #         return False  # Don't go to build phase yet
-    #     else:
-    #         # Disallow moving back to original space
-    #         if new_position == self.initial_position:
-    #             game_scene.show_invalid_movement_popup()
-    #             return False
-    #         # Now done, reset state
-    #         return True
+    def after_selected_move_to(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
+        # * for_all remove callback: after_selected_worker
+        self.clear_all_signals_in_phase(game_scene)
 
-    def on_end_turn(self,  game_scene: "GameScene"):
-        super().on_end_turn(game_scene)
-        self.first_move_done = False
-        self.initial_position = None
+        if not self.moved_to:
+            # * regular
+            self.moved_to = position
+            assert self.initial_position
+            assert self.moved_to
+
+            assert game_scene.map_state.get_tile(
+                self.initial_position).worker == self.selected_worker, "Worker unexpectedly replaced."
+            game_scene.map_state.get_tile(self.initial_position).worker = None
+            game_scene.map_state.get_tile(
+                self.moved_to).worker = self.selected_worker
+            assert self.selected_worker
+            self.selected_worker.position = self.moved_to
+
+            game_scene.update_tile_visuals(self.initial_position)
+            game_scene.update_tile_visuals(self.moved_to)
+            print(
+                f"[Notice] Worker {self.selected_worker} moved : {self.initial_position} >>> {self.moved_to}")
+
+            # ! "The first player to move up to a level-3 tower wins!"
+            if game_scene.map_state.check_if_winning_tile(self.selected_worker.position):
+                game_scene.turn_manager.winner = game_scene.turn_manager.get_current_player()
+                game_scene.match_over()
+
+            # * show skip move button: on click change skip game phase
+            def _skip_action():
+                game_scene.disable_skip_button()
+                self.clear_all_signals_in_phase(game_scene)
+                game_scene.turn_manager.current_phase = Phase.BUILD_STACK
+                self.on_start_current_phase(game_scene)
+            game_scene.enable_skip_button(_skip_action)
+            game_scene.turn_manager.current_phase = Phase.MOVE_WORKER
+            self.on_start_current_phase(game_scene)
+        else:
+            # * ability (2nd move)
+            game_scene.disable_skip_button()  # ? was not used, remove
+            self.moved_to_second = position
+            assert self.moved_to_second
+
+            assert game_scene.map_state.get_tile(
+                self.moved_to).worker == self.selected_worker, "Worker unexpectedly replaced."
+            game_scene.map_state.get_tile(self.moved_to).worker = None
+            game_scene.map_state.get_tile(
+                self.moved_to_second).worker = self.selected_worker
+            assert self.selected_worker
+            self.selected_worker.position = self.moved_to_second
+
+            game_scene.update_tile_visuals(self.moved_to)
+            game_scene.update_tile_visuals(self.moved_to_second)
+
+            print(
+                f"[Notice] Worker {self.selected_worker} moved (again): {self.moved_to} >>> {self.moved_to_second}")
+
+            # ! "The first player to move up to a level-3 tower wins!"
+            if game_scene.map_state.check_if_winning_tile(self.selected_worker.position):
+                game_scene.turn_manager.winner = game_scene.turn_manager.get_current_player()
+                game_scene.match_over()
+
+            game_scene.turn_manager.current_phase = Phase.BUILD_STACK
+            self.on_start_current_phase(game_scene)
+
+    def on_start_turn(self,  game_scene: "GameScene"):
+        super().on_start_turn(game_scene)
+
+        self.moved_to_second = None
 
 
 class Demeter(God):
@@ -214,21 +276,51 @@ class Demeter(God):
 
     def __init__(self):
         super().__init__()
-        # self.first_build_done = False
-        # self.build_position = None
+        self.build_on_second: Optional[Vector2I] = None
 
-    # def on_stack_built(self, worker: Worker, position: Vector2I, game_scene) -> bool:
-    #     if not self.first_build_done:
-    #         self.build_position = position
-    #         self.first_build_done = True
-    #         game_scene.update_phase_info()
-    #         return False  # Don't go to end turn yet
-    #     else:
-    #         # Disallow building back to original space
-    #         if position == self.build_position:
-    #             game_scene.show_invalid_build_popup()
-    #             return False
-    #         # Now done, reset state
-    #         self.first_build_done = False
-    #         self.build_position = None
-    #         return True
+    def on_start_turn(self,  game_scene: "GameScene"):
+        super().on_start_turn(game_scene)
+
+        self.build_on_second = None
+
+    def after_selected_build(self, game_scene: "GameScene", event: "Event[Canvas]", position: Vector2I):
+        # * for_all remove callback: after_selected_worker
+        self.clear_all_signals_in_phase(game_scene)
+
+        if not self.build_on:
+            # * first build
+            self.build_on = position
+
+            game_scene.map_state.get_tile(
+                self.build_on).stack_height += 1
+
+            game_scene.update_tile_visuals(self.build_on)
+
+            print(
+                f"[Notice] Worker {self.selected_worker} built @ {self.build_on}")
+
+            # * show skip move button: on click change skip game phase
+            def _skip_action():
+                game_scene.disable_skip_button()
+                self.clear_all_signals_in_phase(game_scene)
+                game_scene.turn_manager.current_phase = Phase.TURN_END
+                self.on_start_current_phase(game_scene)
+            game_scene.enable_skip_button(_skip_action)
+            game_scene.turn_manager.current_phase = Phase.BUILD_STACK
+            self.on_start_current_phase(game_scene)
+
+        else:
+            # * second (ability) build
+            game_scene.disable_skip_button()  # ? was not used, remove
+            self.build_on_second = position
+
+            game_scene.map_state.get_tile(
+                self.build_on_second).stack_height += 1
+
+            game_scene.update_tile_visuals(self.build_on_second)
+
+            print(
+                f"[Notice] Worker {self.selected_worker} built (again) @ {self.build_on_second}")
+
+            game_scene.turn_manager.current_phase = Phase.TURN_END
+            self.on_start_current_phase(game_scene)
