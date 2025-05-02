@@ -7,7 +7,6 @@ import Scenes
 import GameScene
 
 if __name__ == "__main__":
-
     Preferences()
     # region Launch Args
     Preferences.load_defaults()
@@ -37,3 +36,4 @@ if __name__ == "__main__":
     SceneManager.change_scene(SceneID.TITLE)
     ROOT.mainloop()  # ! Start
     # endregion
+

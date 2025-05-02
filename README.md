@@ -15,5 +15,6 @@ User Stories: https://docs.google.com/document/d/1qGGDGRkIJO3NXx3LltwrCCSCGYfNwY
 	- `pip install pyinstaller` ([See More](https://pyinstaller.org/en/stable/index.html))
 ## Build Steps (Windows)
 1) Ensure current directory is `./code/` (from top level: `cd ./code`)
-2) Build `pyinstaller .\App.py --onedir --name 'Santorini' --contents-directory 'Resources' --hidden-import=tkinter --add-data ./Assets:Assets`
-3) Run bu clicking on the executable in `./dist` or `./dist/Santorini/Santorini.exe`
+
+2) Build `pyinstaller App.py --onefile --add-data "Assets:assets"`
+3) Run by clicking on the executable in `./dist` or `./dist/Santorini/Santorini.exe`

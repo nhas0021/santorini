@@ -1,7 +1,7 @@
 from tkinter import HIDDEN, Canvas, Event, Frame
 from typing import Callable
 from MathLib.Vector import Vector2I
-from Styles import *
+from Assets.Styles import *
 
 
 class TileSprite:

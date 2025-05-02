@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import Frame
-from Styles import *
+from Assets.Styles import *
 
 
 class Scene:

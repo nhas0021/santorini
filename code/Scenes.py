@@ -7,7 +7,8 @@ from typing import cast
 from God import God
 from SceneID import SceneID
 from Preferences import Preferences
-from Styles import *
+from Assets.Styles import *
+from Assets.AssetLoader import *
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
@@ -65,7 +66,7 @@ class MainMenu(Scene):
 
         # image
         # Replace with your image path
-        self.board_image = tk.PhotoImage(file="Resources/Assets/santorini.png")
+        self.board_image = tk.PhotoImage(data=cast(bytes, logo_bin))
         self.image_label = tk.Label(
             self.frame, image=self.board_image, bg=WHITE)
         self.image_label.place(relx=0.7, rely=0.6, anchor="center")

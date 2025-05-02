@@ -1,12 +1,12 @@
 from random import sample
 from tkinter import BOTH, NORMAL, HIDDEN, Tk, Frame, Label, Toplevel, Button
-from typing import Callable, List, Optional, cast
+from typing import Callable, List, Optional
 from MapState import MapState
 from MathLib.Vector import Vector2I
 from Preferences import Preferences
 from SceneID import SceneID
 from SceneSystem.SceneManager import SceneManager
-from Styles import *
+from Assets.Styles import *
 from TileSprite import TileSprite
 from SceneSystem.Scene import Scene
 from TurnManager import Phase, TurnManager
