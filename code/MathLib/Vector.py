@@ -3,7 +3,7 @@ from math import sqrt
 from typing import Optional
 
 
-@dataclass
+@dataclass(frozen=True)
 class Vector2:
     x: float
     y: float
@@ -68,7 +68,7 @@ class Vector2:
             raise IndexError
 
 
-@dataclass
+@dataclass(frozen=True)
 class Vector2I:
     x: int
     y: int
