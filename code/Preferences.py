@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from CustomGods import *
+from God import *
 from MathLib.Vector import Vector2I
 from typing import List, Optional, Type
 
@@ -14,7 +14,7 @@ class Preferences:
     screen_size: Vector2I
     # ~ Game Preferences
     grid_size: Vector2I
-    map_frame_size: Vector2I
+    map_frame_size_px: Vector2I
     max_stacks_before_dome: int
 
     gods_selectable: List[Type[God]] = []
@@ -27,7 +27,7 @@ class Preferences:
         Preferences.screen_size = Vector2I(1920, 1080)
 
         Preferences.grid_size = Vector2I(5, 5)
-        Preferences.map_frame_size = Vector2I(500, 500)
+        Preferences.map_frame_size_px = Vector2I(500, 500)
 
         Preferences.gods_selectable = [Artemis, Demeter]
         Preferences.player_count = 2

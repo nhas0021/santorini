@@ -1,14 +1,14 @@
+from random import sample
 from tkinter import NORMAL, HIDDEN, Tk, Frame, Label, Toplevel, Button
-from typing import Callable, Optional
-from GameState import MapState
+from typing import Callable, List, Optional
+from MapState import MapState
 from MathLib.Vector import Vector2I
 from Preferences import Preferences
 from Styles import *
 from TileSprite import TileSprite
-
 from SceneSystem.Scene import Scene
-from GameManager import GameManager
-from TurnManager import Phase
+from TurnManager import Phase, TurnManager
+from Worker import Worker
 
 
 # TODO: make the Game class hold the grid and not GameScene. use the GameManager to access the grid from the Game here in order to draw it out (this class should only handle UI)
@@ -16,20 +16,24 @@ from TurnManager import Phase
 class GameScene(Scene):
     def __init__(self, root: Tk) -> None:
         super().__init__(root)
+        # ~ initialise data upon entering a scene
+        self.turn_manager: TurnManager
+        self.map_state: MapState
 
+        # ~ initialise visuals before entering a scene (and hide them)
         # region Initiate Visuals
         # region Generate background / environment sprites
         self.frame.config(background=WATER_COLOUR)
 
-        self.map_size: Optional[Vector2I] = None
+        # self.map_size: Optional[Vector2I] = None
 
         # ! Note: Acess should be [x][y].
         self._sprite_tilemap: Optional[list[list[TileSprite]]] = None
 
         self.map_frame: Frame = Frame(
             self.frame,
-            width=Preferences.map_frame_size.x,
-            height=Preferences.map_frame_size.y,
+            width=Preferences.map_frame_size_px.x,
+            height=Preferences.map_frame_size_px.y,
             bg=DIRT_COLOUR, highlightthickness=15,
             highlightbackground=SAND_COLOUR)
 
@@ -73,35 +77,60 @@ class GameScene(Scene):
         # endregion
         return
 
+    def place_random_workers(self):
+        workers: List[Worker] = []
+        for player in self.turn_manager.players:
+            workers.extend(player.workers)
+
+        all_possible_positions = [Vector2I(x, y) for x in range(
+            self.map_state.size.x) for y in range(self.map_state.size.y)]
+        randomised_positions = sample(all_possible_positions, len(workers))
+
+        for worker, position in zip(workers, randomised_positions):
+            # link the logic tile to the worker
+            self.map_state.get_tile(position).worker = worker
+            worker.position = position  # update worker's position
+            self.update_tile_visuals(worker.position)
+
     def on_enter_scene(self):
         # ~ Start-up Game
-        # * load preferences and generate a game state
-        GameManager.setup_game()
-        self.start_game(GameManager.get_game())
-        self.show_player_turn_popup()
-        self.highlight_current_players_workers()
-        self.update_phase_info()
-        self.show_god_info()
+        # ! load preferences and generate a game state
+        # * initialise turn manager and load from preferences
+        self.turn_manager = TurnManager(
+            Preferences.player_count, Preferences.gods_preferences)
+        # * generate map state from preferences
+        self.map_state = MapState(
+            Preferences.grid_size, Preferences.max_stacks_before_dome)
+        self.generate_tilemap_sprites(self.map_state)
+
+        # ! set up for first turn
+        self.place_random_workers()
+        self.turn_manager.get_current_player().god.on_start_turn(self)
+        # self.turn_manager.start_turn(self.map_state)
+        # GameManager.setup_game()
+        # self.start_game(GameManager.get_game())
+        # self.show_player_turn_popup()
+        # self.highlight_current_players_workers()
+        # self.update_phase_info()
+        # self.show_god_info()
+        return  # * control released to event calls
 
     def on_exit_scene(self):
         self.cleanup()
 
-    def start_game(self, map_state: MapState):
+    def generate_tilemap_sprites(self, map_state: MapState):
         # * Generate tilemap sprites
         assert map_state.size.x > 0
         assert map_state.size.y > 0
         self.map_size = map_state.size
         self._sprite_tilemap = [[
             TileSprite(self.map_frame, Vector2I(x, y),
-                       lambda trigger_event, pos=Vector2I(x, y): map_state.get_tile(
+                       lambda e, pos=Vector2I(x, y): map_state.get_tile(
                            # ? allow the sprite to trigger its linked (and stored) events
-                           pos).emit_on_click(trigger_event)
+                           pos).emit_on_click(e)
                        )
             for y in range(self.map_size.y)] for x in range(self.map_size.x)
         ]
-        # * Imprint startup data
-        map_state.startup_game(self)
-        map_state.turn_manager.start_turn(map_state)
 
     # # * Note that tkinter is not fully typed
     # def __on_clicked_tile(self, position: Vector2I, e: Event) -> None:
@@ -247,46 +276,47 @@ class GameScene(Scene):
         assert self._sprite_tilemap
         return self._sprite_tilemap[position.x][position.y]
 
-    def change_stack_visuals(self, tile_position: Vector2I, stack_count: Optional[int] = None):
+    def update_tile_visuals(self, tile_position: Vector2I, stack_count: Optional[int] = None):
         """
         Updates/refreshes the visuals on the provided tiles, with an option provided to change the stack count of said tile in the process
         """
         # ? Get tile sprite parent and tile data (safely)
-        tile = self.get_tile(tile_position)
-        assert GameManager.get_game()
-        tile_data = GameManager.get_game().get_tile(tile_position)
+        tile_sprite = self.get_tile(tile_position)
+        tile_state = self.map_state.get_tile(tile_position)
         # * If stack count provided
         if not stack_count:
-            stack_count = tile_data.stack_height
+            stack_count = tile_state.stack_height
         assert stack_count <= Preferences.max_stacks_before_dome+1
 
         for i in range(Preferences.max_stacks_before_dome):
             if i <= stack_count-1:
-                tile.canvas.itemconfigure(tile.stack_sprites[i], state=NORMAL)
+                tile_sprite.canvas.itemconfigure(
+                    tile_sprite.stack_sprites[i], state=NORMAL)
             else:
-                tile.canvas.itemconfigure(tile.stack_sprites[i], state=HIDDEN)
+                tile_sprite.canvas.itemconfigure(
+                    tile_sprite.stack_sprites[i], state=HIDDEN)
 
-        tile.canvas.itemconfigure(tile.dome_sprite, state=(
+        tile_sprite.canvas.itemconfigure(tile_sprite.dome_sprite, state=(
             NORMAL if stack_count == Preferences.max_stacks_before_dome + 1 else HIDDEN))
 
         # ! Note: this will still place a worker above a dome even if that is not allowed (this should not need to check)
-        worker_centre_x = tile.scaled_tile_size.x // 2
-        worker_centre_y = tile.scaled_tile_size.y - \
-            tile.stack_grow_bottom_offset - tile.stack_height_px * stack_count
+        worker_centre_x = tile_sprite.scaled_tile_size.x // 2
+        worker_centre_y = tile_sprite.scaled_tile_size.y - \
+            tile_sprite.stack_grow_bottom_offset - tile_sprite.stack_height_px * stack_count
 
-        tile.canvas.coords(
-            tile.worker_sprite,
+        tile_sprite.canvas.coords(
+            tile_sprite.worker_sprite,
             worker_centre_x + WORKER_WIDTH_PX,
             worker_centre_y,
             worker_centre_x - WORKER_WIDTH_PX,
             worker_centre_y - WORKER_HEIGHT_PX)  # ! may need to scale with ui scaling
 
-        if tile_data.worker:
-            tile.canvas.itemconfig(
-                tile.worker_sprite, fill=PLAYER_COLORS[tile_data.worker.player_id], state=NORMAL)
+        if tile_state.worker:
+            tile_sprite.canvas.itemconfig(
+                tile_sprite.worker_sprite, fill=PLAYER_COLORS[tile_state.worker.player_id], state=NORMAL)
         else:
-            tile.canvas.itemconfig(
-                tile.worker_sprite, state=HIDDEN)
+            tile_sprite.canvas.itemconfig(
+                tile_sprite.worker_sprite, state=HIDDEN)
 
     def cleanup(self):
         # TODO reset everything
@@ -297,7 +327,7 @@ class GameScene(Scene):
         self.current_phase = Phase.SELECT_WORKER
 
     def show_player_turn_popup(self):
-        current_player = GameManager.get_game().get_current_player()
+        current_player = self.turn_manager.get_current_player()
         popup = Label(
             self.frame,
             text=f"Player {current_player.id}'s Turn!",

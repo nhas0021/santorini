@@ -1,10 +1,10 @@
 import tkinter as tk
 
-import GameScene as GameScene
 from SceneID import SceneID
 from Preferences import Preferences
 from SceneSystem.SceneManager import SceneManager
 import Scenes
+import GameScene
 
 if __name__ == "__main__":
 
@@ -28,7 +28,8 @@ if __name__ == "__main__":
     SceneManager.register_scene(SceneID.MAIN_MENU,  Scenes.MainMenu(ROOT))
     SceneManager.register_scene(SceneID.PRE_GAME,  Scenes.PreGame(ROOT))
     SceneManager.register_scene(SceneID.GAME, GameScene.GameScene(ROOT))
-    SceneManager.register_scene(SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
+    SceneManager.register_scene(
+        SceneID.GOD_ASSIGNMENT, Scenes.GodAssignment(ROOT))
     SceneManager.register_scene(SceneID.RULEBOOK, Scenes.RuleBook(ROOT))
     SceneManager.register_scene(SceneID.GAME_OVER, Scenes.GameOver(ROOT))
     # endregion
@@ -38,7 +39,3 @@ if __name__ == "__main__":
     SceneManager.change_scene(SceneID.TITLE)
     ROOT.mainloop()  # ! Start
     # endregion
-
-"""
-https://stackoverflow.com/a/76918213
-"""

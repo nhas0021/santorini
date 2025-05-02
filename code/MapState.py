@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from MathLib.Vector import Vector2I
 from Worker import Worker
 from TileState import TileState
@@ -16,35 +16,14 @@ class MapState:
             for x in range(size.x)
         ]
 
-    # def startup_game(self):
-    #     # assert renderer
-    #     # self.renderer = renderer
-    #     self.place_random_workers()
-    #     # self.turn_manager.current_phase = Phase.SELECT_WORKER
-    #     # self.turn_manager.current_player_index = 0
-
-    # def place_random_workers(self):
-    #     # Flatten the grid into a list of all tiles
-    #     all_tiles = [tile for row in self._map_state for tile in row]
-
-    #     # Shuffle tiles
-    #     shuffle(all_tiles)
-
-    #     # --- Get all the workers ---
-    #     workers: List[Worker] = []
-    #     for player in self.players:
-    #         workers.extend(player.workers)
-
-    #     # --- Place each worker on a tile ---
-    #     assert self.renderer
-    #     for worker, tile in zip(workers, all_tiles):
-    #         logic_tile = self.get_tile(tile.position)
-    #         logic_tile.worker = worker  # link the logic tile to the worker
-    #         worker.position = tile.position  # update worker's position
-    #         self.renderer.change_stack_visuals(worker.position)
-
     def get_tile(self, position: Vector2I):
         return self._map_state[position.x][position.y]
+
+    def for_all_tiles(self):
+        """ A special accesssor for iterating over all items. """
+        for row in self._map_state:
+            for item in row:
+                yield item
 
     def check_unoccupied_space(self, position: Vector2I):
         """

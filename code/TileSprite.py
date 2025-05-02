@@ -1,5 +1,5 @@
-from tkinter import NORMAL, HIDDEN, DISABLED, Canvas, Event, Misc,  Frame
-from typing import Callable, List
+from tkinter import HIDDEN, Canvas, Event, Frame
+from typing import Callable
 from MathLib.Vector import Vector2I
 from Styles import *
 
@@ -12,18 +12,13 @@ class TileSprite:
     This tile generates the shapes instead of compositing using images, this for sprint 2 (to be changed in sprint 3)
     """
 
-    def __init__(self, parent_frame: Frame, position: Vector2I, on_click_callback: Callable[[Event], None]) -> None:
+    def __init__(self, parent_frame: Frame, position: Vector2I, on_click_callback: Callable[["Event[Canvas]"], None]) -> None:
         # ! Gameplay Data
         self.position: Vector2I = position
-        self.stack_height_px: int = 15
         # ! Sprite / Data
-        # ? Note: some of this might be better suited in styles
-        self.stack_sprites: List[int] = []
-        self.dome_sprite
-        # * Note: Change colours for different players rather than make a new one
-        self.worker_sprite
-
+        self.stack_height_px: int = 15
         self.scaled_tile_size = TILE_SIZE  # TODO add scaling
+        # ? Note: some of this might be better suited in styles
 
         self.canvas = Canvas(parent_frame, width=self.scaled_tile_size.x,
                              height=self.scaled_tile_size.y, bg=GRASS_COLOUR, highlightthickness=0)
@@ -62,7 +57,7 @@ class TileSprite:
 
         # * Dome
         dome_width = 20
-        self.dome_sprite = self.canvas.create_arc(canvas_centre + dome_width,
+        self.dome_sprite = self.canvas.create_arc(canvas_centre + dome_width,  # type: ignore[PylancereportUnknownMemberType] #! tkinter badly typed
                                                   stack_grow_from_y - self.stack_height_px*2,
                                                   canvas_centre - dome_width,
                                                   stack_grow_from_y - self.stack_height_px*4,
@@ -72,6 +67,7 @@ class TileSprite:
         # * Worker (colour change for different players)
         worker_pos_y = stack_grow_from_y
 
+        # * Note: Change colours for different players rather than make a new one
         self.worker_sprite = self.canvas.create_oval(canvas_centre + WORKER_WIDTH_PX,
                                                      worker_pos_y,
                                                      canvas_centre - WORKER_WIDTH_PX,

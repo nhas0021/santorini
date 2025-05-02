@@ -11,7 +11,6 @@ from Styles import *
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
-from GameManager import GameManager
 
 
 class Title (Scene):
@@ -340,3 +339,4 @@ class GameOver(Scene):
         self.winner_label.config(
             text=f"🎉 Player {winner.id} Wins! 🎉"
         )
+    # TODO make this an overlay for game scene

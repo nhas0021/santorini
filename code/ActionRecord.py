@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
 from MathLib.Vector import Vector2I
-from Player import Player
 from Worker import Worker
 
 

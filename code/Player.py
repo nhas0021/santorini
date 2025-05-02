@@ -8,9 +8,9 @@ class Player:
     player_count = 0
 
     def __init__(self):
-        Player.player_count += 1
         self.god: God
         self.id = Player.player_count
+        Player.player_count += 1 # * assign then increment
         self.workers: list[Worker] = [Worker(self.id), Worker(self.id)]
 
     def assign_god(self, god: God):
