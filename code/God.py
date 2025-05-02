@@ -126,19 +126,24 @@ class God:
         Note: Generally a phase setup will do the following:
             1) get all tiles
             2) check if they are valid to be selected during this phase
+                a) if there are no valid tiles - stalemate/lose
             3) assign a callback event based on this choice
         """
         print(
-            f"[Notice] Current scene is {game_scene.turn_manager.current_phase}")
+            f"[Notice] Current phase is {game_scene.turn_manager.current_phase}")
+
+        valid_move_exists = False
         match game_scene.turn_manager.current_phase:
             case Phase.TURN_START:
                 game_scene.turn_manager.current_phase = Phase.SELECT_WORKER
                 self.on_start_current_phase(game_scene)
+                valid_move_exists = True
             case Phase.TURN_END:
                 # ? Turn over to next player
                 game_scene.turn_manager.current_phase = Phase.TURN_START
                 game_scene.turn_manager.increment_player_turn()
                 self.on_end_turn(game_scene)
+                valid_move_exists = True
 
             case Phase.SELECT_WORKER:
                 # * for_all( if tile has worker add callback: after_selected_worker )
@@ -148,6 +153,7 @@ class God:
                             game_scene, _event, _position)
                         tile_state.connect_on_click(signal)
                         self._signals_in_phase.append(signal)
+                        valid_move_exists = True
 
             case Phase.MOVE_WORKER:
                 for tile_state in game_scene.map_state.for_all_tiles():
@@ -158,6 +164,7 @@ class God:
                             game_scene, _event, _position)
                         tile_state.connect_on_click(signal)
                         self._signals_in_phase.append(signal)
+                        valid_move_exists = True
                     else:
                         pass  # attach warning signal
             case Phase.BUILD_STACK:
@@ -168,6 +175,9 @@ class God:
                             game_scene, _event, _position)
                         tile_state.connect_on_click(signal)
                         self._signals_in_phase.append(signal)
+                        valid_move_exists = True
+        if not valid_move_exists:
+            print("TODO LOSE STALEMATE")
 
 
 class Blank(God):
