@@ -38,7 +38,17 @@ class GameScene(Scene):
         self.map_frame.place(relx=0.5, rely=0.5, anchor="center")
         # endregion
         # region Generate popups
-        self.skip_action_button = Button(self.frame, text="Skip")
+        self.skip_action_button = Button(
+            self.frame,
+            text="Skip",
+            font=("Arial", 18, "bold"),  # Make the text bold and larger
+            bg="red",  # Set the background color to something prominent
+            fg="white",  # Set the text color to white
+            padx=20,  # Add padding to the sides of the button
+            pady=10,  # Add padding to the top and bottom of the button
+            bd=5,  # Add a border to make it stand out more
+            relief="raised",  # Raised effect for a 3D button
+        )
 
         # show the current game phase
         self.info_panel = Frame(
