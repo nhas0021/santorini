@@ -1,5 +1,4 @@
 # FIT3077 Repository
-
 File Organization:  
   All documents related to Sprint 2 can be found under the sprint2 folder  
   The source code is located in the "code" folder.  
