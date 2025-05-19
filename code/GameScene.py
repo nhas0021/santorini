@@ -138,7 +138,7 @@ class GameScene(Scene):
         """Attach and action to this button which is used to skip an optional action."""
         print("[Notice] Can skip this action.")
         self.skip_action_button.config(command=action)
-        self.skip_action_button.place(relx=1, rely=1, anchor="se")
+        self.skip_action_button.place(relx=1.0, rely=0.5, anchor="e")
 
     def disable_skip_button(self):
         """Disable this button"""
