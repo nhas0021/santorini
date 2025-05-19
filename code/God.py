@@ -22,6 +22,11 @@ class God:
         self.moved_to: Optional[Vector2I] = None
         self.build_on: Optional[Vector2I] = None
 
+    def can_build_on(self, map_state, selected_worker, target_position, excluded = None) -> bool:
+        # default behavior
+        return map_state.validate_build_position(selected_worker, target_position, excluded)
+
+
     def clear_all_signals_in_phase(self, game_scene: "GameScene"):
         """Remove all the stored singals that were used this phase."""
         for tile in game_scene.map_state.for_all_tiles():
@@ -203,11 +208,9 @@ class God:
                 for tile_state in game_scene.map_state.for_all_tiles():
                     assert self.selected_worker
                     if exclude_builds is not None:
-                        valid = game_scene.map_state.validate_build_position(
-                            self.selected_worker, tile_state.position, excluded=exclude_builds)
+                        valid = self.can_build_on(game_scene.map_state, self.selected_worker, tile_state.position, excluded=exclude_builds)
                     else:
-                        valid = game_scene.map_state.validate_build_position(
-                            self.selected_worker, tile_state.position)
+                        valid = self.can_build_on(game_scene.map_state, self.selected_worker, tile_state.position)
                     if valid:
                         signal: Callable[[Event[Canvas], Vector2I], None] = lambda _event, _position: self.after_selected_build(
                             game_scene, _event, _position)
@@ -371,3 +374,12 @@ class Demeter(God):
 
             game_scene.turn_manager.current_phase = Phase.TURN_END
             self.on_start_current_phase(game_scene)
+
+class Zeus(God):
+    NAME = "Zeus"
+    DESCRIPTION = "Your Worker may build a block under itself."
+
+    def can_build_on(self, map_state, worker, target_position, excluded=None):
+        if target_position == worker.position:
+            return True #cannot build dome under worker as player would have already won in that case
+        return super().can_build_on(map_state, worker, target_position, excluded)

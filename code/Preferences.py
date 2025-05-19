@@ -29,6 +29,6 @@ class Preferences:
         Preferences.grid_size = Vector2I(5, 5)
         Preferences.map_frame_size_px = Vector2I(500, 500)
 
-        Preferences.gods_selectable = [Artemis, Demeter]
+        Preferences.gods_selectable = [Artemis, Demeter, Zeus]
         Preferences.player_count = 2
         Preferences.max_stacks_before_dome = 3
