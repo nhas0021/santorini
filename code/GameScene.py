@@ -1,5 +1,5 @@
 from random import sample
-from tkinter import BOTH, NORMAL, HIDDEN, Tk, Frame, Label, Toplevel, Button
+from tkinter import BOTH, NORMAL, HIDDEN, Tk, Frame, Label, Toplevel, Button, filedialog
 from typing import Callable, List, Optional
 from MapState import MapState
 from MathLib.Vector import Vector2I
@@ -11,6 +11,7 @@ from TileSprite import TileSprite
 from SceneSystem.Scene import Scene
 from TurnManager import Phase, TurnManager
 from Worker import Worker
+import json
 
 
 class GameScene(Scene):
@@ -130,6 +131,14 @@ class GameScene(Scene):
         )
         self.main_menu_button.pack(pady=30)
 
+        self.save_button = Button(
+            self.frame,
+            text="Save Game",
+            font=("Arial", 14),
+            bg="yellow",
+            fg="black"
+        )
+
         # endregion
         # endregion
         return
@@ -138,7 +147,7 @@ class GameScene(Scene):
         """Attach and action to this button which is used to skip an optional action."""
         print("[Notice] Can skip this action.")
         self.skip_action_button.config(command=action)
-        self.skip_action_button.place(relx=1.0, rely=0.5, anchor="e")
+        self.skip_action_button.place(relx=0.85, rely=0.5, anchor="center")
 
     def disable_skip_button(self):
         """Disable this button"""
@@ -501,3 +510,16 @@ class GameScene(Scene):
         text = f"God: {current_player.god.NAME}\n\n{current_player.god.DESCRIPTION}"
 
         self.god_info_label.config(text=text)
+
+    def enable_save_game_button(self, action: Callable[[], None]):
+        """Attach an action to this button which is used to save current game before current player takes any action"""
+        print("[Notice] Can save game now.")
+        self.save_button.config(command=action)
+        self.save_button.place(relx=0.85, rely=0.5, anchor="center")
+
+    def disable_save_game_button(self):
+        """Disable this button"""
+        self.save_button.config(command=lambda: None)
+        self.save_button.place_forget()
+
+    

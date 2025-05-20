@@ -157,6 +157,7 @@ class God:
 
         match game_scene.turn_manager.current_phase:
             case Phase.TURN_START:
+                game_scene.enable_save_game_button(None)
                 game_scene.turn_manager.current_phase = Phase.SELECT_WORKER
                 self.on_start_current_phase(game_scene)
                 valid_move_exists = True
@@ -180,8 +181,10 @@ class God:
                         valid_move_exists = True
                 game_scene.update_phase_info()
                 game_scene.show_god_info()
+    
 
             case Phase.MOVE_WORKER:
+                game_scene.disable_save_game_button()
                 exclude_moves = getattr(self, "tiles_moved_this_turn", None)
                 for tile_state in game_scene.map_state.for_all_tiles():
                     assert self.selected_worker
