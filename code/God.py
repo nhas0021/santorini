@@ -157,7 +157,7 @@ class God:
 
         match game_scene.turn_manager.current_phase:
             case Phase.TURN_START:
-                game_scene.enable_save_game_button(None)
+                game_scene.enable_save_game_button(game_scene.save_game_to_file)
                 game_scene.turn_manager.current_phase = Phase.SELECT_WORKER
                 self.on_start_current_phase(game_scene)
                 valid_move_exists = True

@@ -12,6 +12,7 @@ from SceneSystem.Scene import Scene
 from TurnManager import Phase, TurnManager
 from Worker import Worker
 import json
+from GameSaver import GameSaver
 
 
 class GameScene(Scene):
@@ -24,6 +25,7 @@ class GameScene(Scene):
         # ~ initialise data upon entering a scene not during scene creation
         self.turn_manager: TurnManager
         self.map_state: MapState
+        self.root = root
 
         # ~ initialise visuals before entering a scene (and hide them)
         # region Initiate Visuals
@@ -521,5 +523,16 @@ class GameScene(Scene):
         """Disable this button"""
         self.save_button.config(command=lambda: None)
         self.save_button.place_forget()
+
+    def save_game_to_file(self):
+        saver = GameSaver(self.turn_manager, self.map_state)
+        success = saver.save_game()
+
+        if success:
+            print("[Exit] Save successful. Closing game...")
+            self.root.destroy() 
+        else:
+            print("[Notice] Save cancelled or failed.")
+
 
     
