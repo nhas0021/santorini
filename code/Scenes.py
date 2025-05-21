@@ -11,6 +11,7 @@ from Assets.Styles import *
 from Assets.AssetLoader import *
 from tkinter import filedialog
 import json
+from GameStorageManager import GameStorageManager
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
@@ -87,8 +88,8 @@ class MainMenu(Scene):
   
         with open(file_path, "r") as f:
             saved_data = json.load(f)
-        # Temporarily store it in Preferences (already used elsewhere)
-        Preferences.saved_game_data = saved_data
+ 
+        GameStorageManager.saved_game_data = saved_data
         print("[Load] Game data loaded, changing to GameScene...")
         SceneManager.change_scene(SceneID.GAME)
     
