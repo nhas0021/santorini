@@ -9,17 +9,16 @@ class TurnManager:
     Facilitates the process of turns/actions, storing and modifing the history of every move/action
     """
 
-    def __init__(self, player_count: int, player_gods_preferences: List[Optional[Type[God]]]) -> None:
+    def __init__(self) -> None:
         # * Generate players / assign
         self.players: list[Player] = []
-        self._initialize_players(player_count, player_gods_preferences)
         self.current_player_index = 0
         self.current_phase: Phase = Phase.TURN_START
-
         self.winner: Optional[Player] = None
         self.losers: List[Player] = []
 
-    def _initialize_players(self, count: int, player_gods_preferences: List[Optional[Type[God]]]):
+
+    def initialize_players(self, count: int, player_gods_preferences: List[Optional[Type[God]]]):
         self.players.clear()
         Player.reset_player_count()
 

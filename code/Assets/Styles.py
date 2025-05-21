@@ -6,7 +6,7 @@ from typing import Callable
 from MathLib.Vector import Vector2I
 
 # region Timing
-POPUP_DURATION = 5000
+POPUP_DURATION = 1500
 # endregion
 
 # region Colours

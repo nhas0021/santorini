@@ -11,8 +11,8 @@ from TileSprite import TileSprite
 from SceneSystem.Scene import Scene
 from TurnManager import Phase, TurnManager
 from Worker import Worker
-import json
 from GameSaver import GameSaver
+from Player import Player
 
 
 class GameScene(Scene):
@@ -191,11 +191,18 @@ class GameScene(Scene):
             self.update_tile_visuals(worker.position)
 
     def on_enter_scene(self):
+        # ✅ If a saved game is available, load it
+        if Preferences.saved_game_data is not None:
+            print("[Notice] Loading saved game...")
+            self.load_from_saved_data(Preferences.saved_game_data)
+            Preferences.saved_game_data = None # Prevent reloading on next scene
+            return
+        
         # ~ Start-up Game
         # ! load preferences and generate a game state
         # * initialise turn manager and load from preferences
-        self.turn_manager = TurnManager(
-            Preferences.player_count, Preferences.gods_preferences)
+        self.turn_manager = TurnManager()
+        self.turn_manager.initialize_players(Preferences.player_count, Preferences.gods_preferences)
         # * generate map state from preferences
         self.map_state = MapState(
             Preferences.grid_size, Preferences.max_stacks_before_dome)
@@ -206,6 +213,55 @@ class GameScene(Scene):
         self.turn_manager.get_current_player().god.on_start_turn(self)
         self.turn_manager.get_current_player().god.on_start_current_phase(self)
         return  # * control released to event calls
+    
+    def load_from_saved_data(self, data: dict):
+       
+        def get_god_by_name(name: str):
+            for god_cls in Preferences.gods_selectable:
+                if god_cls.NAME == name:
+                    return god_cls()
+
+
+        # 1. Set up map state
+        size_x = len(data["board"])
+        size_y = len(data["board"][0])
+        grid_size = Vector2I(size_x, size_y)
+        self.map_state = MapState(grid_size, Preferences.max_stacks_before_dome)
+        self.generate_tilemap_sprites(self.map_state)
+
+        for x in range(size_x):
+            for y in range(size_y):
+                self.map_state.get_tile(Vector2I(x, y)).stack_height = data["board"][x][y]
+
+        # 2. Set up turn manager and players
+        self.turn_manager = TurnManager()
+        self.turn_manager.current_phase = Phase[data["game_phase"]]
+        self.turn_manager.current_player_index = data["current_turn_index"]
+
+        for player_data in data["players"]:
+            player = Player()
+            player.workers.clear() #remove the default workers created on initialization
+            player.id = player_data['id']
+            player.assign_god(get_god_by_name(player_data["god"]))
+            for pos in player_data["workers"]:
+                worker = Worker(player_data["id"])
+                worker.position = Vector2I(*pos)
+                player.workers.append(worker)
+                self.map_state.get_tile(worker.position).worker = worker
+            self.turn_manager.players.append(player)
+
+        self.turn_manager.current_player_index = data["current_turn_index"]
+        self.turn_manager.current_phase = Phase[data["game_phase"]]
+
+        # 3. Draw tiles
+        for x in range(size_x):
+            for y in range(size_y):
+                self.update_tile_visuals(Vector2I(x, y))
+
+        # 4. Resume game flow
+        self.turn_manager.get_current_player().god.on_start_turn(self)
+        self.turn_manager.get_current_player().god.on_start_current_phase(self)
+
 
     def on_exit_scene(self):
         self.cleanup()
@@ -216,6 +272,7 @@ class GameScene(Scene):
         assert map_state.size.x > 0
         assert map_state.size.y > 0
         self.map_size = map_state.size
+        
         self._sprite_tilemap = [[
             TileSprite(self.map_frame, Vector2I(x, y),
                        lambda e, pos=Vector2I(x, y): map_state.get_tile(

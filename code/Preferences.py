@@ -22,6 +22,9 @@ class Preferences:
     player_count: int
     gods_preferences: List[Optional[Type[God]]] = []
 
+    #to store game loaded from a file
+    saved_game_data: Optional[dict] = None
+
     @staticmethod
     def load_defaults() -> None:
         Preferences.screen_size = Vector2I(1920, 1080)

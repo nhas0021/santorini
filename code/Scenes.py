@@ -9,6 +9,8 @@ from SceneID import SceneID
 from Preferences import Preferences
 from Assets.Styles import *
 from Assets.AssetLoader import *
+from tkinter import filedialog
+import json
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
@@ -41,23 +43,28 @@ class MainMenu(Scene):
 
         self.button_play = generate_main_menu_button_positive(
             self.frame, "Play", lambda: SceneManager.change_scene(SceneID.PRE_GAME))
-        self.button_play.place(relx=0.2, rely=0.25, anchor="w")
+
+        self.button_load = generate_main_menu_button_positive(
+            self.frame, "Load Game", self.load_game_from_file)
 
         self.button_tutorial = generate_main_menu_button_positive(
             self.frame, "Tutorial", lambda: SceneManager.change_scene(SceneID.TUTORIAL))
-        self.button_tutorial.place(relx=0.2, rely=0.4, anchor="w")
 
         self.button_rulebook = generate_main_menu_button_positive(
             self.frame, "Rule Book", lambda: SceneManager.change_scene(SceneID.RULEBOOK))
-        self.button_rulebook.place(relx=0.2, rely=0.55, anchor="w")
 
         self.button_settings = generate_main_menu_button_positive(
             self.frame, "Settings", lambda: SceneManager.change_scene(SceneID.SETTINGS))
-        self.button_settings.place(relx=0.2, rely=0.7, anchor="w")
 
         self.button_quit = generate_main_menu_button_negative(
             self.frame, "Quit", root.destroy)
-        self.button_quit.place(relx=0.2, rely=0.85, anchor="w")
+
+        self.button_play.place(relx=0.2, rely=0.25, anchor="w")
+        self.button_load.place(relx=0.2, rely=0.35, anchor="w")
+        self.button_tutorial.place(relx=0.2, rely=0.45, anchor="w")
+        self.button_rulebook.place(relx=0.2, rely=0.55, anchor="w")
+        self.button_settings.place(relx=0.2, rely=0.65, anchor="w")
+        self.button_quit.place(relx=0.2, rely=0.75, anchor="w")
 
         # image
         # Replace with your image path
@@ -65,6 +72,26 @@ class MainMenu(Scene):
         self.image_label = tk.Label(
             self.frame, image=self.board_image, bg=WHITE)
         self.image_label.place(relx=0.7, rely=0.6, anchor="center")
+
+    def load_game_from_file(self):
+        file_path = filedialog.askopenfilename(
+            defaultextension=".json",
+            filetypes=[("JSON Files", "*.json")],
+            title="Load Saved Game"
+        )
+
+        if not file_path:
+            print("[Load] Cancelled.")
+            return
+
+  
+        with open(file_path, "r") as f:
+            saved_data = json.load(f)
+        # Temporarily store it in Preferences (already used elsewhere)
+        Preferences.saved_game_data = saved_data
+        print("[Load] Game data loaded, changing to GameScene...")
+        SceneManager.change_scene(SceneID.GAME)
+    
 
 
 class PreGame(Scene):
