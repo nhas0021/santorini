@@ -259,6 +259,7 @@ class Artemis(God):
 
         if not self.moved_to:
             # * regular
+            self.tiles_moved_this_turn.append(self.initial_position) #prevents from moving to initial position
             self.moved_to = position
             self.tiles_moved_this_turn.append(position)
             assert self.initial_position
