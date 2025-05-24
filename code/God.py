@@ -158,8 +158,14 @@ class God:
         match game_scene.turn_manager.current_phase:
             case Phase.TURN_START:
                 game_scene.enable_save_game_button(game_scene.save_game_to_file)
+                game_scene.turn_manager.total_turns_played += 1
+
+                if game_scene.turn_manager.total_turns_played > 0 and game_scene.turn_manager.total_turns_played % 5 == 0:
+                    game_scene.turn_manager.randomize_gods()
+                    game_scene.show_god_assignment_popup()
+
                 game_scene.turn_manager.current_phase = Phase.SELECT_WORKER
-                self.on_start_current_phase(game_scene)
+                game_scene.turn_manager.get_current_player().god.on_start_current_phase(game_scene) #calls new god's method if reassignment has taken place
                 valid_move_exists = True
             case Phase.TURN_END:
                 # ? Turn over to next player

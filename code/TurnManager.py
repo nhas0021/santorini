@@ -2,6 +2,8 @@ from typing import List, Optional, Type, cast
 from God import God
 from Player import Player
 from TurnPhase import Phase
+from Preferences import Preferences
+from random import sample
 
 
 class TurnManager:
@@ -16,6 +18,7 @@ class TurnManager:
         self.current_phase: Phase = Phase.TURN_START
         self.winner: Optional[Player] = None
         self.losers: List[Player] = []
+        self.total_turns_played = 0 #reset when loaded from a saved game
 
 
     def initialize_players(self, count: int, player_gods_preferences: List[Optional[Type[God]]]):
@@ -35,3 +38,18 @@ class TurnManager:
     def increment_player_turn(self):
         self.current_player_index = (
             self.current_player_index + 1) % len(self.players)
+        
+    def randomize_gods(self):
+        print("[Randomize Gods] Reassigning gods...")
+
+        assert Preferences.player_count <= len(Preferences.gods_selectable), \
+            "Not enough gods for the number of players."
+
+        Preferences.gods_preferences = sample(
+            Preferences.gods_selectable, Preferences.player_count
+        )
+
+        for i, player in enumerate(self.players):
+            god_cls = Preferences.gods_preferences[i]
+            player.god = god_cls()
+            print(f"Player {i + 1} is now {player.god.NAME}")

@@ -13,6 +13,7 @@ from TurnManager import Phase, TurnManager
 from Worker import Worker
 from GameStorageManager import GameStorageManager
 from Player import Player
+import tkinter.messagebox as messagebox
 
 
 class GameScene(Scene):
@@ -540,6 +541,16 @@ class GameScene(Scene):
             self.root.destroy() 
         else:
             print("[Notice] Save cancelled or failed.")
+
+    def show_god_assignment_popup(self):
+        """
+        Shows a modal popup listing each player and their currently assigned god.
+        """
+        assignments = "\n".join(
+            [f"Player {i + 1}: {player.god.NAME}" for i, player in enumerate(self.turn_manager.players)]
+        )
+
+        messagebox.showinfo("Gods Reassigned", f"New god assignments:\n\n{assignments}")
 
 
     
