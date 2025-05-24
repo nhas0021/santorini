@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Callable, List, Optional
 from MathLib.Vector import Vector2I
 from TurnPhase import Phase
 from Worker import Worker
+
 if TYPE_CHECKING:
     from GameScene import GameScene
 
@@ -160,7 +161,7 @@ class God:
                 game_scene.enable_save_game_button(game_scene.save_game_to_file)
                 game_scene.turn_manager.total_turns_played += 1
 
-                if game_scene.turn_manager.total_turns_played > 0 and game_scene.turn_manager.total_turns_played % 5 == 0:
+                if game_scene.turn_manager.total_turns_played > 0 and game_scene.turn_manager.total_turns_played % 5 == 0 and game_scene.turn_manager.check_reassignment_preferences():
                     game_scene.turn_manager.randomize_gods()
                     game_scene.show_god_assignment_popup()
 

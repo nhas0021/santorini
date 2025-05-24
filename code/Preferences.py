@@ -21,6 +21,7 @@ class Preferences:
 
     player_count: int
     gods_preferences: List[Optional[Type[God]]] = []
+    reassign_gods_during_game: bool = False
 
     @staticmethod
     def load_defaults() -> None:

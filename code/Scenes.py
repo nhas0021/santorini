@@ -12,6 +12,7 @@ from Assets.AssetLoader import *
 from tkinter import filedialog
 import json
 from GameStorageManager import GameStorageManager
+from tkinter import BooleanVar, Checkbutton
 
 from SceneSystem.Scene import Scene
 from SceneSystem.SceneManager import SceneManager
@@ -204,6 +205,21 @@ class GodAssignment(Scene):
         self.result_frame = tk.Frame(self.frame, bg=WHITE)
         self.result_frame.pack(pady=10)
 
+        # BooleanVar linked to the checkbox
+        self.reassign_gods_var = BooleanVar(value=Preferences.reassign_gods_during_game)
+
+        self.reassign_checkbox = Checkbutton(
+            self.frame,
+            text="Reassign god powers every 5 turns",
+            variable=self.reassign_gods_var,
+            relief="groove",
+            font=(FONT_GENERAL, 12),
+            bg=BLACK,
+            fg= WHITE,
+            selectcolor=BLACK
+        )
+        self.reassign_checkbox.pack(pady=10)
+
         self.start_game_button = tk.Button(
             self.frame,
             text="Start Game",
@@ -212,7 +228,7 @@ class GodAssignment(Scene):
             fg=WHITE,
             padx=20,
             pady=10,
-            command=lambda: SceneManager.change_scene(SceneID.GAME)
+            command=self.start_game
         )
         self.start_game_button.pack(pady=20)
         self.start_game_button.config(state=tk.DISABLED)
@@ -264,7 +280,8 @@ class GodAssignment(Scene):
         self.start_game_button.config(state=tk.NORMAL)
 
     def start_game(self):
-        # not a registered secne yet so throws an error
+        #Save checkbox state to Preferences before starting the game
+        Preferences.reassign_gods_during_game = self.reassign_gods_var.get()
         SceneManager.change_scene(SceneID.GAME)
 
 

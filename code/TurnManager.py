@@ -53,3 +53,7 @@ class TurnManager:
             god_cls = Preferences.gods_preferences[i]
             player.god = god_cls()
             print(f"Player {i + 1} is now {player.god.NAME}")
+
+    #prevents circular import error in God.py
+    def check_reassignment_preferences(self):
+        return Preferences.reassign_gods_during_game
