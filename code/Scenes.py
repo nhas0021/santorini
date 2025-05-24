@@ -277,6 +277,7 @@ class GodAssignment(Scene):
             )
             player_label.pack(anchor="w", pady=5)
 
+        self.assign_button.config(state=tk.DISABLED)
         self.start_game_button.config(state=tk.NORMAL)
 
     def start_game(self):
