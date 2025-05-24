@@ -197,6 +197,7 @@ class GameScene(Scene):
             print("[Notice] Loading saved game...")
             GameStorageManager.load_into_scene(self)
             GameStorageManager.saved_game_data = None # Prevent reloading on next scene
+            self.prompt_reassign_toggle()
             return
         
         # ~ Start-up Game
@@ -552,5 +553,17 @@ class GameScene(Scene):
 
         messagebox.showinfo("Gods Reassigned", f"New god assignments:\n\n{assignments}")
 
+    def prompt_reassign_toggle(self):
+        """
+        Show a Yes/No popup asking whether god reassignment should be enabled.
+        Only used after loading a saved game, if user skipped the checkbox screen.
+        """
+        response = messagebox.askyesno(
+            "Enable God Reassignment?",
+            "Would you like to reassign god powers every 5 turns in this game?"
+        )
+
+        Preferences.reassign_gods_during_game = response
+        print(f"[Prompt] God reassignment set to: {response}")
 
     
