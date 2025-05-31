@@ -10,11 +10,20 @@ from Player import Player
 from Worker import Worker
 
 class GameStorageManager:
+    """
+    Handles saving and loading of the game state to and from JSON files.
 
-    #to store game loaded from a file
+    Stores static game data used to resume a previously saved game and provides
+    methods for extracting, serializing, and restoring full game state data.
+    
+    Attributes:
+        saved_game_data (Optional[dict]): Temporarily holds the saved game data loaded from file.
+    """
+
     saved_game_data: Optional[dict] = None
 
     def save_game(turn_manager: TurnManager, map_state: MapState) -> bool:
+        """Saves the current game state to a JSON file using a file dialog."""
         file_path = filedialog.asksaveasfilename(
             defaultextension=".json",
             filetypes=[("JSON Files", "*.json")],
@@ -36,6 +45,7 @@ class GameStorageManager:
             return False
 
     def extract_game_state(turn_manager: TurnManager, map_state: MapState):
+        """Extracts the current state of the game and formats it into a serializable structure."""
         return {
             "players": [
                 {
@@ -57,10 +67,7 @@ class GameStorageManager:
         }
     
     def load_into_scene(scene):
-        """
-        Rebuilds map_state and turn_manager inside the given GameScene using the saved JSON data.
-        """
-
+        """Loads saved game data into the provided scene, rebuilding map, players, and game flow."""
         data = GameStorageManager.saved_game_data
 
         def get_god_by_name(name: str):

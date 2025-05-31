@@ -5,6 +5,10 @@ from TileState import TileState
 
 
 class MapState:
+    """
+    Represents the logical state of the game board, including tile stacks and worker positions.
+    """
+
     def __init__(self, size: Vector2I, max_stacks_before_dome: int):
         # ! Save match settings to this instance of a game (usually this is loaded from preferences)
         self.max_stacks_before_dome = max_stacks_before_dome

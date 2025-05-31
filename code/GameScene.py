@@ -153,7 +153,7 @@ class GameScene(Scene):
         self.skip_action_button.place(relx=0.85, rely=0.5, anchor="center")
 
     def disable_skip_button(self):
-        """Disable this button"""
+        """Disable the skip button"""
         self.skip_action_button.config(command=lambda: None)
         self.skip_action_button.place_forget()
 
@@ -192,6 +192,8 @@ class GameScene(Scene):
             self.update_tile_visuals(worker.position)
 
     def on_enter_scene(self):
+        """Set up the game scene when entering, either from scratch or a saved game."""
+
         # ✅ If a saved game is available, load it
         if GameStorageManager.saved_game_data is not None:
             print("[Notice] Loading saved game...")
@@ -217,6 +219,7 @@ class GameScene(Scene):
         return  # * control released to event calls
     
     def on_exit_scene(self):
+        """Clean up and hide UI elements when exiting the scene."""
         self.cleanup()
         self.match_result_overlay.pack_forget()
 
@@ -530,11 +533,12 @@ class GameScene(Scene):
         self.save_button.place(relx=0.85, rely=0.5, anchor="center")
 
     def disable_save_game_button(self):
-        """Disable this button"""
+        """Disable the save game button"""
         self.save_button.config(command=lambda: None)
         self.save_button.place_forget()
 
     def save_game_to_file(self):
+        """Trigger saving the game state and exit if successful."""
         success = GameStorageManager.save_game(self.turn_manager, self.map_state)
 
         if success:

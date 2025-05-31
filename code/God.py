@@ -9,6 +9,10 @@ if TYPE_CHECKING:
 
 
 class God:
+    """
+    Base class for all gods, defining the default behavior for turn-based actions.
+    """
+
     NAME: str = "PLACEHOLDER NAME"
     """Override this."""
     DESCRIPTION: str = "PLACEHOLDER DESCRIPTION"
@@ -24,6 +28,7 @@ class God:
         self.build_on: Optional[Vector2I] = None
 
     def can_build_on(self, map_state, selected_worker, target_position, excluded = None) -> bool:
+        """Determines if the selected worker can build on the target tile."""
         # default behavior
         return map_state.validate_build_position(selected_worker, target_position, excluded)
 

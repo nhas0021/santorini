@@ -22,6 +22,7 @@ class TurnManager:
 
 
     def initialize_players(self, count: int, player_gods_preferences: List[Optional[Type[God]]]):
+        """Initializes player instances and assigns each a god based on preferences."""
         self.players.clear()
         Player.reset_player_count()
 
@@ -33,13 +34,16 @@ class TurnManager:
                 cast(Type[God], player_gods_preferences[i])())
 
     def get_current_player(self) -> Player:
+        """Returns the player whose turn it currently is."""
         return self.players[self.current_player_index]
 
     def increment_player_turn(self):
+        """Advances the turn to the next player in a circular manner."""
         self.current_player_index = (
             self.current_player_index + 1) % len(self.players)
         
     def randomize_gods(self):
+        """Randomly reassigns new god powers to all players from the selectable list."""
         print("[Randomize Gods] Reassigning gods...")
 
         assert Preferences.player_count <= len(Preferences.gods_selectable), \
@@ -56,4 +60,5 @@ class TurnManager:
 
     #prevents circular import error in God.py
     def check_reassignment_preferences(self):
+        """Checks if periodic god reassignment is enabled in preferences."""
         return Preferences.reassign_gods_during_game

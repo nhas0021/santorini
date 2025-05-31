@@ -4,6 +4,10 @@ from Worker import Worker
 
 
 class Player:
+    """
+    Represents a player in the game, each with a unique ID, assigned god, and two workers.
+    """
+
     # Keep count of number of players initialized (also their id)
     player_count = 0
 

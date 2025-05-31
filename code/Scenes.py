@@ -19,6 +19,10 @@ from SceneSystem.SceneManager import SceneManager
 
 
 class Title (Scene):
+    """
+    Scene shown at game launch, prompting the user to start the game by clicking anywhere.
+    """
+
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
 
@@ -27,6 +31,11 @@ class Title (Scene):
         self.start_bg_button.pack(fill="both", expand=True)
 
 class MainMenu(Scene):
+    """
+    Main menu scene where users can navigate to start a game, load a save, view the tutorial,
+    access the rule book or settings, or quit the application.
+    """
+     
     def __init__(self, root: tk.Tk) -> None:
         super().__init__(root)
 
@@ -76,6 +85,7 @@ class MainMenu(Scene):
         self.image_label.place(relx=0.7, rely=0.6, anchor="center")
 
     def load_game_from_file(self):
+        
         file_path = filedialog.askopenfilename(
             defaultextension=".json",
             filetypes=[("JSON Files", "*.json")],
@@ -97,6 +107,10 @@ class MainMenu(Scene):
 
 
 class PreGame(Scene):
+    """
+    Scene for configuring the game before it begins, including player count and grid size display.
+    """
+
     def __init__(self, root: tk.Tk):
         super().__init__(root)
         self.frame.config(background=WHITE)
@@ -169,6 +183,11 @@ class PreGame(Scene):
 
 
 class GodAssignment(Scene):
+    """
+    Scene for assigning gods to players before the game begins. Includes the option to
+    randomize god powers and toggle periodic reassignment.
+    """
+     
     def __init__(self, root: tk.Tk):
         super().__init__(root)
         self.frame.config(background=WHITE)
@@ -287,6 +306,10 @@ class GodAssignment(Scene):
 
 
 class RuleBook(Scene):
+    """
+    Displays the rule book text to the user with a scrollable text box and a back button.
+    """
+    
     def __init__(self, root: tk.Tk):
         super().__init__(root)
 

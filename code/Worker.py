@@ -3,7 +3,7 @@ from MathLib.Vector import Vector2I
 
 class Worker:
     def __init__(self, player_id: int):
-        self.position: Vector2I = None  # ? Might not need
+        self.position: Vector2I = None  
         self.player_id = player_id
 
     def move(self, new_position: Vector2I):
