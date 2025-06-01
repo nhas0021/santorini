@@ -1,6 +1,6 @@
 # FIT3077 Repository
 File Organization:  
-  All documents related to Sprint 2 can be found under the sprint2 folder  
+  All documents related to Sprint 3 can be found under the sprint3 folder  
   The source code is located in the "code" folder.  
   The 'code' folder also consists of the build.bat which can be used to build the executable as described below.  
 
