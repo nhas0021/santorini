@@ -1,8 +1,11 @@
-# FIT3077 Repository
-File Organization:  
-  All documents related to Sprint 3 can be found under the sprint3 folder  
-  The source code is located in the "code" folder.  
-  The 'code' folder also consists of the build.bat which can be used to build the executable as described below.  
+# Santorini  
+Welcome to Santorini, a strategic board game brought to life through code!
+
+This project is a digital version of the popular board game Santorini, originally designed by Gordon Hamilton. It blends tactical decision-making with simple rules, making it both easy to learn and challenging to master.
+
+In our implementation, two players take turns moving workers and building structures on a 5x5 grid. The goal? Be the first to move one of your workers to the third level of a building. It’s a game of logic, planning, and clever moves, with God Powers that add exciting twists to the gameplay.
+
+Whether you're a fan of board games or looking to explore turn-based game development, we hope you enjoy exploring (and playing!) our version of Santorini. 
 
 File links Sprint 1:
 
