@@ -7,6 +7,8 @@ In our implementation, two players take turns moving workers and building struct
 
 Whether you're a fan of board games or looking to explore turn-based game development, we hope you enjoy exploring (and playing!) our version of Santorini. 
 
+
+
 File links Sprint 1:
 
 Domain Model Justifications: https://docs.google.com/document/d/1yKH65VIyLR54c94-UZSKeysLO1F8Y0hoMnV8pnum_mQ/edit?tab=t.0#heading=h.jebknf66jved    
